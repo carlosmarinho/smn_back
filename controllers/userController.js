@@ -6,6 +6,12 @@ class UserController {
 
     }
 
+    async view(req, res){
+        const users =await User.findById(req.params.id)
+        console.log(users);
+        res.json(users)
+    }
+
     async viewAll(req, res){
         const users =await User.find({})
         console.log(users);
