@@ -37,12 +37,20 @@ class UserController {
     }
 
     async getAllFields(req, res){
-        let fields = await User.schema.paths;
+        try {
+            //console.log("aqui no getAllfields");
+            let fields = await User.schema.paths;
+            //Não posso deletar pois buga o mongo depois
+            //delete fields['_id'];
+            //delete fields['__v'];
+            res.json(fields);
 
-        //Não posso deletar pois buga o mongo depois
-        //delete fields['_id'];
-        //delete fields['__v'];
-        res.json(fields);
+        }
+        catch(err){
+            console.log(err);
+            res.status(400).json("erro ao pegar os campos")
+        }
+
     }
 }
 
