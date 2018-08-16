@@ -1,9 +1,78 @@
+const _ = require ('lodash/core')
 const mongoose = require('mongoose')
 const User = mongoose.model('users');
 
 class UserController {
     constructor(){
 
+    }
+
+    async deleteUsers(req, res) {
+
+        let ar = []
+        let ret = await Promise.all( _.map(req.query, async (user_id) => {
+            
+            try{
+                let user = await User.findByIdAndDelete(user_id)
+                if(user) 
+                    return (`Usuário '${user.username}' excluido com sucesso!`);
+                else {
+                    console.log(`Usuário com o id '${user_id}' não existe!`);
+                    return (`Usuário com o id '${user_id}' não existe!`);
+                }
+            }
+            catch(err){
+                console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
+                
+                return (`Houve um problema ao excluir o usuário com o id '${req.params.id}`);
+            }
+            
+        }) )
+
+        console.log("\n\n\nretorno: ", ret);
+
+        res.status(200).json(ret)
+    }
+
+    async deleteUser(req, res) {
+        try{
+            let user = await User.findByIdAndDelete(req.params.id);
+            if(user)
+                res.status(200).json(`Usuário '${user.username}' excluido com sucesso!`);
+            else
+                res.status(200).json(`Usuário com o id '${req.params.id}' não existe!`);
+        }
+        catch(err){
+            console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
+            res.status(500).json("Houve um problema ao excluir o usuário");
+        }
+    }
+
+    async edit(req, res){
+        if(req.body.username == 'erro'){
+            res.status(400).json("meu erro não vai cadastrar")
+            return;
+        }
+
+        const user = await User.findById(req.params.id)
+        try{
+            user.set(req.body)
+            let res_user = await user.save()
+            //res_user.mensagem = `Usuário ${res_user.username} editado com sucesso!`
+            let obj_ret = {obj: res_user, message: `Usuário ${res_user.username} editado com sucesso!`}
+            res.status(200).json(obj_ret)
+
+            //const users =await User.find({})
+            //res.status(200).json(users)
+
+            //res.status(200).json(`Usuário ${res_user.username} editado com sucesso!`)
+
+            
+        }
+        catch(err){
+            console.log("\n\n\nerrors: ", err, "\n\n\n");
+            res.status(400).json(err.errors)
+        }
     }
 
     async view(req, res){
