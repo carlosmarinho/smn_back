@@ -38,9 +38,9 @@ class UserController {
         try{
             let user = await User.findByIdAndDelete(req.params.id);
             if(user)
-                res.status(200).json(`Usuário '${user.username}' excluido com sucesso!`);
+                res.status(200).json({message: `Usuário '${user.username}' excluido com sucesso!`});
             else
-                res.status(200).json(`Usuário com o id '${req.params.id}' não existe!`);
+                res.status(200).json({message: `Usuário com o id '${req.params.id}' não existe!`});
         }
         catch(err){
             console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
@@ -84,7 +84,7 @@ class UserController {
     async viewAll(req, res){
         const users =await User.find({})
         console.log(users);
-        res.json(users)
+        res.json({users: users})
     }
 
     async add(req, res, next) {
