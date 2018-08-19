@@ -11,36 +11,41 @@ class UserController {
 
         let ar = []
         let ret = await Promise.all( _.map(req.query, async (user_id) => {
-            
+            console.log("delete users: ", user_id)
             try{
                 let user = await User.findByIdAndDelete(user_id)
                 if(user) 
-                    return (`Usuário '${user.username}' excluido com sucesso!`);
+                    return ({id: user._id, status: true, message: `Usuário '${user.username}' excluido com sucesso!`});
                 else {
-                    console.log(`Usuário com o id '${user_id}' não existe!`);
-                    return (`Usuário com o id '${user_id}' não existe!`);
+                    return ({id: user_id, status: false, message: `Usuário com o id '${user_id}' não existe!`});
                 }
             }
             catch(err){
                 console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
                 
-                return (`Houve um problema ao excluir o usuário com o id '${req.params.id}`);
+                return ({id: user_id, status: false, message: `Houve um problema ao excluir o usuário com o id '${req.params.id}`});
             }
             
         }) )
 
-        console.log("\n\n\nretorno: ", ret);
+        
 
-        res.status(200).json(ret)
+        res.status(200).json({action:"remove", return: ret});
     }
 
     async deleteUser(req, res) {
+
+        console.log("vai deletar o user");
         try{
             let user = await User.findByIdAndDelete(req.params.id);
-            if(user)
-                res.status(200).json({message: `Usuário '${user.username}' excluido com sucesso!`});
-            else
-                res.status(200).json({message: `Usuário com o id '${req.params.id}' não existe!`});
+            if(user) {
+                console.log("o user existe e foi excluido: ", user);
+                res.status(200).json({action: 'remove', return: [{id: user._id, status: true, message: `Usuário '${user.username}' excluido com sucesso!`}]});
+            }
+            else {
+                console.log("o user não existe e não foi excluido: ", user);
+                res.status(200).json({action: 'remove', return: [{id: user._id, status: true, message: `Usuário com o id '${req.params.id}' não existe!`}]});
+            }
         }
         catch(err){
             console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
