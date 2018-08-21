@@ -7,6 +7,18 @@ class UserController {
 
     }
 
+    async view(req, res){
+        const users =await User.findById(req.params.id)
+        console.log(users);
+        res.json(users)
+    }
+
+    async viewAll(req, res){
+        const users =await User.find({})
+        console.log(users);
+        res.json({users: users})
+    }
+
     async deleteUsers(req, res) {
 
         let ar = []
@@ -39,16 +51,13 @@ class UserController {
         try{
             let user = await User.findByIdAndDelete(req.params.id);
             if(user) {
-                console.log("o user existe e foi excluido: ", user);
                 res.status(200).json({action: 'remove', return: [{id: user._id, status: true, message: `Usuário '${user.username}' excluido com sucesso!`}]});
             }
             else {
-                console.log("o user não existe e não foi excluido: ", user);
                 res.status(200).json({action: 'remove', return: [{id: user._id, status: true, message: `Usuário com o id '${req.params.id}' não existe!`}]});
             }
         }
         catch(err){
-            console.log("\n\n\nErro ao excluir: ", err, "\n\n\n\n");
             res.status(500).json("Houve um problema ao excluir o usuário");
         }
     }
@@ -75,22 +84,11 @@ class UserController {
             
         }
         catch(err){
-            console.log("\n\n\nerrors: ", err, "\n\n\n");
             res.status(400).json(err.errors)
         }
     }
 
-    async view(req, res){
-        const users =await User.findById(req.params.id)
-        console.log(users);
-        res.json(users)
-    }
 
-    async viewAll(req, res){
-        const users =await User.find({})
-        console.log(users);
-        res.json({users: users})
-    }
 
     async add(req, res, next) {
         if(req.body.username == 'erro'){
@@ -106,7 +104,6 @@ class UserController {
         }
         catch(err){
             res.status(400).json(err.errors)
-            console.log("Usuário não foi inserido", err)
         }
     }
 
