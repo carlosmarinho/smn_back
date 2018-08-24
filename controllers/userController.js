@@ -91,19 +91,30 @@ class UserController {
 
 
     async add(req, res, next) {
-        if(req.body.username == 'erro'){
-            res.status(400).json("meu erro não vai cadastrar")
-            return;
-        }
-        console.log('\n\n', req.body, "\n\n");
-        let user = new User(req.body);
+
+                
+        console.log('file: ', req.body.files, "\n\n\n");
+        console.log('file: ', req.files, "\n\n\n");
+        console.log('file: ', req.file, "\n\n\n");
+        
+        _.map(req.body, (value, key) => {
+            console.log("value: ", value)
+            if(value instanceof Object){
+                console.log("o objecto ", key, " deve ser removido");
+            }
+        })
         try{
-            console.log("deveria ter criado aqui");
-            let res_user = await user.save()
-            res.status(200).json(`Usuário ${res_user.username} cadastrado com sucesso!`)
+            let user = new User(req.body);
+            let res_user = await user.save();
+            res.status(200).json(`Usuário ${res_user.username} cadastrado com sucesso!`);
         }
         catch(err){
-            res.status(400).json(err.errors)
+            if(err.errors)
+                res.status(400).json(err.errors)
+            else{
+                res.status(500).json("Houve um erro ao cadastrar o usuário!");
+                console.log(err)
+            }
         }
     }
 
