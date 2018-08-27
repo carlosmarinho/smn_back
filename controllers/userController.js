@@ -75,12 +75,6 @@ class UserController {
             //res_user.mensagem = `Usuário ${res_user.username} editado com sucesso!`
             let obj_ret = {obj: res_user, message: `Usuário ${res_user.username} editado com sucesso!`}
             res.status(200).json(obj_ret)
-
-            //const users =await User.find({})
-            //res.status(200).json(users)
-
-            //res.status(200).json(`Usuário ${res_user.username} editado com sucesso!`)
-
             
         }
         catch(err){
@@ -114,8 +108,11 @@ class UserController {
 
             console.log("\n\n\nnovo body: ", req.body);
 
-            let user = new User(req.body);
-            let res_user = await user.save();
+
+            
+            let user = new User();
+            user.set(req.body)
+            let res_user = await user.save()
             
             res.status(200).json(`Usuário ${res_user.username} cadastrado com sucesso!`);
         }
