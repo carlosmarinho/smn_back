@@ -11,6 +11,5 @@ const userSchema = new Schema ({
     age: {type: Number, min: [18, "Você deve ser maior de 18 anos"], max: [80, "você não deve ser maior que 80 anos"] }
 }) 
 
-
 userSchema.plugin(beautifyUnique);
 mongoose.model('users', userSchema);

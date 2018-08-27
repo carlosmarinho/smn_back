@@ -14,7 +14,7 @@ class UserController {
     }
 
     async viewAll(req, res){
-        const users =await User.find({})
+        const users =await User.find({}).sort({_id: -1})
         console.log(users);
         res.json({users: users})
     }
@@ -92,23 +92,35 @@ class UserController {
 
     async add(req, res, next) {
 
-                
-        console.log('file: ', req.body.files, "\n\n\n");
-        console.log('file: ', req.files, "\n\n\n");
-        console.log('file: ', req.file, "\n\n\n");
+        console.log('body: ', req.body, "\n\n\n");
+        console.log('files: ', req.files, "\n\n\n");
         
-        _.map(req.body, (value, key) => {
-            console.log("value: ", value)
-            if(value instanceof Object){
-                console.log("o objecto ", key, " deve ser removido");
-            }
-        })
         try{
+            let imgs = await this.getAllImagesFields();
+
+            if(imgs.length > 0){
+                if(imgs.lenght == 1){
+                    req.body[imgs.path] = JSON.stringify(req.files[0]);
+                }
+                else {
+                    imgs.map((img,i) => {
+
+                        if(req.files[i] && req.files[i] != undefined) {
+                            req.body[img.path] = JSON.stringify(req.files[i]);
+                        }
+                    })
+                }
+            }
+
+            console.log("\n\n\nnovo body: ", req.body);
+
             let user = new User(req.body);
             let res_user = await user.save();
+            
             res.status(200).json(`Usuário ${res_user.username} cadastrado com sucesso!`);
         }
         catch(err){
+            console.log("\n\n\ndeu ruim: ", err);
             if(err.errors)
                 res.status(400).json(err.errors)
             else{
@@ -133,6 +145,25 @@ class UserController {
             res.status(400).json("erro ao pegar os campos")
         }
 
+    }
+
+    async getAllImagesFields(req, res){
+        try {
+            //console.log("aqui no getAllfields");
+            let fields = await User.schema.paths;
+            //Não posso deletar pois buga o mongo depois
+            let new_fields = await Promise.all(_.filter(fields, field => {
+                return field.options.image
+            }))
+            
+
+            return (new_fields);
+
+        }
+        catch(err){
+            console.log(err);
+            return err;
+        }
     }
 }
 

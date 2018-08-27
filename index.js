@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const keys = require('./config/keys');
 var multer  = require('multer')
 var path = require('path')
-
+const fs = require('fs');
 
 
 
@@ -14,17 +14,14 @@ var storage = multer.diskStorage({
       cb(null, 'uploads/')
     },
     filename: function (req, file, cb) {
-        console.log("\n\n\n\nrequest body", req.body, "\n\n\n");
+        
         if(req.body.resource && req.body.resource != undefined && req.body.resource != ''){
-            let upload_dir = path.dirname(require.main) + "/uploads/" + req.body.resource;
-            console.log("uploaddir: ", upload_dir);
+            let upload_dir = path.dirname(require.main.filename) + "/uploads/" + req.body.resource;
             fs.exists(upload_dir, function(exists) {
                 if(exists){
-                    console.log("\n\n\nexiste o upload dir vai cadastrar aqui: \n\n\n");
                     cb(null, `${req.body.resource}/` + Date.now() +  path.extname(file.originalname)) 
                 }
                 else{
-                    console.log("\n\nnão existe\n\n");
                     cb(null, Date.now() +  path.extname(file.originalname)) 
                 }
             })
@@ -54,17 +51,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-app.post("/users", upload.single('files'), (req, res) => {
+/* app.post("/users", upload.single('files'), (req, res) => {
 
     console.log("request: ", req.file);
     console.log("request body: ", req.body);
     res.status(200).json(`Usuário ehehehhe!`);
 
-} )
+} ) */
 
 //Routes
 require('./routes/userRoutes')(app,upload)
-
 
 
 const PORT = process.env.PORT || 3001;
