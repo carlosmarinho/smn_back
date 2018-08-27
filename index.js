@@ -61,6 +61,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Routes
 require('./routes/userRoutes')(app,upload)
+require('./routes/imageRoutes')(app)
 
 
 const PORT = process.env.PORT || 3001;

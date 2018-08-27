@@ -1,6 +1,7 @@
 const _ = require ('lodash/core')
 const mongoose = require('mongoose')
 const User = mongoose.model('users');
+const path = require('path')
 
 class UserController {
     constructor(){
@@ -11,6 +12,14 @@ class UserController {
         const users =await User.findById(req.params.id)
         console.log(users);
         res.json(users)
+    }
+
+    async viewImage(req, res){
+        const users =await User.findById(req.params.id)
+        console.log(users);
+        //res.sendFile('/uploads/' + uid + '/' + file);
+        res.sendFile(path.dirname(require.main.filename) + "/" + JSON.parse(users.image).path);
+        //res.json(JSON.parse(users.image).path)
     }
 
     async viewAll(req, res){
