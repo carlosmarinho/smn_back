@@ -105,10 +105,6 @@ class UserController {
                     })
                 }
             }
-
-            console.log("\n\n\nnovo body: ", req.body);
-
-
             
             let user = new User();
             user.set(req.body)
