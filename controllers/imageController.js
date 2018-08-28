@@ -4,14 +4,22 @@ const mongoose = require('mongoose')
 const path = require('path')
 
 class ImageController {
+    
     constructor(){
-
+        this.ar = [];
+        this.ar["user"] = "users";
+        
+    }
+    
+    getModel(resource) {
+        return this.ar[resource];
     }
 
     async viewImage(req, res){
         
         const resource = req.params.resource;
-        const model = mongoose.model(resource);
+        
+        const model = mongoose.model(this.getModel(resource));
 
         console.log("\n\n\n\nresource: ", resource, "\n\n");
         const obj =await model.findById(req.params.id)
