@@ -14,22 +14,7 @@ var storage = multer.diskStorage({
       cb(null, 'uploads/')
     },
     filename: function (req, file, cb) {
-        
-        if(req.body.resource && req.body.resource != undefined && req.body.resource != ''){
-            let upload_dir = path.dirname(require.main.filename) + "/uploads/" + req.body.resource;
-            fs.exists(upload_dir, function(exists) {
-                if(exists){
-                    cb(null, `${req.body.resource}/` + Date.now() +  path.extname(file.originalname)) 
-                }
-                else{
-                    cb(null, Date.now() +  path.extname(file.originalname)) 
-                }
-            })
-        }
-        else {
-            cb(null,  Date.now() +  path.extname(file.originalname)) 
-        }
-
+        cb(null,  file.originalname ) 
     }
 })
   

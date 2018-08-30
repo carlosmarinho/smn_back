@@ -21,10 +21,16 @@ class ImageController {
         
         const model = mongoose.model(this.getModel(resource));
 
-        console.log("\n\n\n\nresource: ", resource, "\n\n");
+        let fieldname = req.params.fieldname;
+
         const obj =await model.findById(req.params.id)
+
+        if(obj[fieldname] == undefined)
+            return false;
+
+        //console.log("\n\n\no objeto fieldname: ", fieldname, ' ----- ', obj[fieldname])
         //res.sendFile('/uploads/' + uid + '/' + file);
-        res.sendFile(path.dirname(require.main.filename) + "/" + JSON.parse(obj.image).path);
+        res.sendFile(path.dirname(require.main.filename) + "/" + JSON.parse(obj[fieldname]).path);
         //res.json(JSON.parse(obj.image).path)
     }
 

@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema ({
     image: {type: String, image:true},
+    image1: {type: String, image:true},
     username: {type: String, required: true, unique: "Username '{VALUE}' já está em uso. Favor escolher outro!"},
     first_name: {type: String, required: "Primeiro nome é obrigatório"},
     last_name: {type: String, required: false},

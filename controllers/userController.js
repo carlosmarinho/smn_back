@@ -1,8 +1,9 @@
-const _ = require ('lodash/core')
-const mongoose = require('mongoose')
+const _ = require ('lodash/core');
+const mongoose = require('mongoose');
 const User = mongoose.model('users');
-const path = require('path')
-
+const path = require('path');
+const fs = require('fs');
+const appRoot = require('app-root-path');
 class UserController {
     constructor(){
 
@@ -76,9 +77,15 @@ class UserController {
             res.status(400).json("meu erro não vai cadastrar")
             return;
         }
+        
+        console.log("o body no edit: ", req.body, "\n\n\n");
 
         const user = await User.findById(req.params.id)
         try{
+            this.deleteImages(req, user);
+            await this.prepareImages(req, );
+            
+
             user.set(req.body)
             let res_user = await user.save()
             //res_user.mensagem = `Usuário ${res_user.username} editado com sucesso!`
@@ -91,7 +98,7 @@ class UserController {
         }
     }
 
-
+    
 
     async add(req, res, next) {
 
@@ -99,25 +106,15 @@ class UserController {
         console.log('files: ', req.files, "\n\n\n");
         
         try{
-            let imgs = await this.getAllImagesFields();
-
-            if(imgs.length > 0){
-                if(imgs.lenght == 1){
-                    req.body[imgs.path] = JSON.stringify(req.files[0]);
-                }
-                else {
-                    imgs.map((img,i) => {
-
-                        if(req.files[i] && req.files[i] != undefined) {
-                            req.body[img.path] = JSON.stringify(req.files[i]);
-                        }
-                    })
-                }
-            }
             
             let user = new User();
             user.set(req.body)
             let res_user = await user.save()
+            
+            await this.prepareImages(req, res_user);
+            res_user.set(req.body);
+            console.log('body no try: ', req.body, "\n\n\n");
+            await res_user.save()
             
             res.status(200).json(`Usuário ${res_user.username} cadastrado com sucesso!`);
         }
@@ -130,6 +127,35 @@ class UserController {
                 console.log(err)
             }
         }
+    }
+    
+    async deleteImages(req, user){
+        console.log("\n\n\ndelete image: ", req.body)
+        if(req.files.length > 0 ){
+            let imgs = await this.getAllImagesFields();
+
+            imgs.map(img => {
+                //console.log("\n\nbody::::::", req.body[img.path][]);
+                if(req.body[img.path]){
+                    //console.log(user[])
+
+                    fs.unlink( JSON.parse(user[img.path]).path, err => {
+                        if(err)
+                            console.log(err);
+                        else
+                            console.log("arquivo excluido com sucesso")
+
+                    })
+                }
+            })
+
+            /* req.files.map(file => {
+
+   
+            }) */
+    
+        }
+
     }
 
     async getAllFields(req, res){
@@ -149,21 +175,75 @@ class UserController {
 
     }
 
-    async getAllImagesFields(req, res){
+    async prepareImages(req, user) {
+        let imgs = await this.getAllImagesFields();
+
+        if(imgs.length > 0){
+            if(imgs.length == 1){
+                console.log("arquivos: ", req.files[0]);
+                req.body[imgs.path] = JSON.stringify(req.files[0]);
+            }
+            else {
+                await imgs.map(async (img,i) => {
+                    //if(req.files[i] && req.files[i] != undefined) {
+                    if(req.body[img.path] !== undefined ) {
+
+                        await req.files.map(async file => {
+                            if(img.path && req.body[img.path] == file.originalname){
+                                await this.moveImage(file, req, img.path);
+                                console.log("\n\n\nbody no prepare images: ", req.body);
+                            }
+                        })
+                    }
+                })
+            }
+        }
+    }
+
+    async moveImage(file, req, db_field){
+        let dt = new Date();
+        let year = dt.getFullYear()
+        let year_month = dt.getFullYear() + "/" + (dt.getMonth() + 1)
+        let new_path = file.path.replace("uploads/", `uploads/${req.body.resource}/${year_month}/`)
+
+        if (! fs.existsSync(`uploads/${req.body.resource}/${year_month}`)) {
+            if (! fs.existsSync(`uploads/${req.body.resource}/`)) {
+                console.log("vai criar o diretorio upload user resource");
+                fs.mkdirSync(`${appRoot}/uploads/${req.body.resource}/`)
+            }
+            
+            if (! fs.existsSync(`uploads/${req.body.resource}/${year}`)) {
+                console.log("vai criar o diretorio upload user resource year");
+                fs.mkdirSync(`${appRoot}/uploads/${req.body.resource}/${year}`)
+            }
+
+            if (! fs.existsSync(`uploads/${req.body.resource}/${year_month}`)) {
+                console.log("vai criar o diretorio upload user resource year mes");
+                fs.mkdirSync(`${appRoot}/uploads/${req.body.resource}/${year_month}`)
+            }
+        }
+
+        fs.renameSync(file.path, new_path);
+
+        file.path = new_path;
+
+        req.body[db_field] = JSON.stringify(file);
+        console.log("\n\n\nbody movefile: ", req.body);
+        
+    }
+
+    async getAllImagesFields(){
         try {
-            //console.log("aqui no getAllfields");
             let fields = await User.schema.paths;
             //Não posso deletar pois buga o mongo depois
             let new_fields = await Promise.all(_.filter(fields, field => {
                 return field.options.image
             }))
             
-
             return (new_fields);
 
         }
         catch(err){
-            console.log(err);
             return err;
         }
     }
