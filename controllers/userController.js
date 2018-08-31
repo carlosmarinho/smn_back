@@ -223,7 +223,26 @@ class UserController {
             }
         }
 
-        fs.renameSync(file.path, new_path);
+        console.log("oooo file: ", file);
+
+        if(!fs.existsSync(new_path)) {
+            fs.renameSync(file.path, new_path);
+        }
+        else{
+            new_path = new_path.replace('.','_1.');
+            
+            if(!fs.existsSync(new_path)) {
+                    fs.renameSync(file.path, new_path);
+            }
+            else {
+                new_path = new_path.replace('_1','_2');
+                
+                if(!fs.existsSync(new_path)) {
+                    fs.renameSync(file.path, new_path);
+                }
+            }
+        }
+        
 
         file.path = new_path;
 

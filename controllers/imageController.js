@@ -34,6 +34,14 @@ class ImageController {
         //res.json(JSON.parse(obj.image).path)
     }
 
+    viewImagePath(req, res){
+        if(req.params.path){
+            console.log("req.params.path: ", req.params.path);
+            res.sendFile(path.dirname(require.main.filename) + "/" + req.params.path);
+        }
+        
+    }
+
 
 }
 
