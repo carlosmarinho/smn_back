@@ -72,6 +72,21 @@ class UserController {
         }
     }
 
+    async updateField(req, res) {
+        console.log("\n\n\no body aqui: ", req.body);
+        const user = await User.findById(req.body.id)
+        try{
+            user[req.body.field] = req.body.value;
+            let res_user = await user.save()
+            let obj_ret = {obj: res_user, message: `Usuário ${res_user.username} editado com sucesso!`}
+            res.status(200).json(obj_ret)
+        }
+        catch(err){
+            res.status(400).json(err.errors)
+        }
+        
+    }
+
     async edit(req, res){
         if(req.body.username == 'erro'){
             res.status(400).json("meu erro não vai cadastrar")
@@ -130,7 +145,7 @@ class UserController {
     }
     
     async deleteImages(req, user){
-        console.log("\n\n\ndelete image: ", req.body)
+        
         if(req.files.length > 0 ){
             let imgs = await this.getAllImagesFields();
 
