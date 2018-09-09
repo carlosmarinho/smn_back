@@ -11,6 +11,7 @@ const userSchema = new Schema ({
     first_name: {type: String, required: "Primeiro nome é obrigatório"},
     last_name: {type: String, required: false},
     age: {type: Number, min: [18, "Você deve ser maior de 18 anos"], max: [80, "você não deve ser maior que 80 anos"] },
+    information: {type: String, inputForm: 'quill'},
     type: {type: String, enum: ['administrador', 'editor', 'usuário'], default: 'usuário'},
     status: {type: Boolean, default: true},
 

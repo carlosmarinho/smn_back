@@ -194,11 +194,15 @@ class UserController {
         let imgs = await this.getAllImagesFields();
 
         if(imgs.length > 0){
-            if(imgs.length == 1){
+            /* if(imgs.length == 1){
                 console.log("arquivos: ", req.files[0]);
-                req.body[imgs.path] = JSON.stringify(req.files[0]);
+                console.log('imgs0: ', imgs[0])
+                //req.body[imgs[0].path] = JSON.stringify(req.files[0]);
+               
+                console.log('imgs0: ', imgs[0].path)
+
             }
-            else {
+            else */ {
                 await imgs.map(async (img,i) => {
                     //if(req.files[i] && req.files[i] != undefined) {
                     if(req.body[img.path] !== undefined ) {

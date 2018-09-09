@@ -28,7 +28,7 @@ class ImageController {
         if(obj[fieldname] == undefined)
             return false;
 
-        //console.log("\n\n\no objeto fieldname: ", fieldname, ' ----- ', obj[fieldname])
+        console.log("\n\n\no objeto fieldname: ", fieldname, ' ----- ', obj[fieldname])
         //res.sendFile('/uploads/' + uid + '/' + file);
         res.sendFile(path.dirname(require.main.filename) + "/" + JSON.parse(obj[fieldname]).path);
         //res.json(JSON.parse(obj.image).path)
@@ -36,7 +36,7 @@ class ImageController {
 
     viewImagePath(req, res){
         if(req.params.path){
-            console.log("req.params.path: ", req.params.path);
+            console.log("\n\n\nreq.params.path: ", req.params.path);
             res.sendFile(path.dirname(require.main.filename) + "/" + req.params.path);
         }
         
