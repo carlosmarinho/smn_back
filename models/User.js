@@ -7,6 +7,7 @@ const { Schema } = mongoose;
 const userSchema = new Schema ({
     image: {type: String, image:true, featured: true},
     username: {type: String, required: true, unique: "Username '{VALUE}' já está em uso. Favor escolher outro!"},
+    password: {type: String, inputForm: 'password'},
     email: {type: String, required: true, unique: "Email '{VALUE}' já está cadastado!", validate: [ isEmail, 'Email inválido' ]},
     first_name: {type: String, required: "Primeiro nome é obrigatório"},
     last_name: {type: String, required: false},
