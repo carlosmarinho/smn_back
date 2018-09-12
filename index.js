@@ -1,10 +1,16 @@
 const express = require('express');
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
 const mongoose = require('mongoose');
 const keys = require('./config/keys');
-var multer  = require('multer')
-var path = require('path')
+const multer  = require('multer');
+const path = require('path');
 const fs = require('fs');
+
+require('./models/User');
+require("./services/passport"); //we don't assign to nothing because we just wanna to execute the code into passport.js
+
 
 
 
@@ -30,10 +36,21 @@ const app = express();
 
 var cors = require('cors');
 
+
 // use it before all route definitions
 app.use(cors({origin: 'http://localhost:3000'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(
+    cookieSession({
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        keys: [keys.cookieKey]
+    })
+)
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 /* app.post("/users", upload.single('files'), (req, res) => {
@@ -45,8 +62,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 } ) */
 
 //Routes
-require('./routes/userRoutes')(app,upload)
-require('./routes/imageRoutes')(app)
+require('./routes/userRoutes')(app,upload);
+require('./routes/authRoutes')(app, passport);
+require('./routes/imageRoutes')(app);
 
 
 const PORT = process.env.PORT || 3001;

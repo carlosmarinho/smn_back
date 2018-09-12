@@ -10,4 +10,5 @@ module.exports = (app, upload) => {
     app.put("/users/:id", upload.array('files'), (req, res) => controller.edit(req, res) )
     //app.post("/users", upload.single('files'), (req, res) => controller.add(req, res) )
     app.post("/users", upload.array('files'), (req, res) => controller.add(req, res) )
+    app.post("/login", (req, res) => controller.login(req, res) )
 }
