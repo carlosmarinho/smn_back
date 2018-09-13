@@ -46,7 +46,7 @@ class TagController {
                         console.log("ERRO: tag: ", tag.name, " não foi incluido!");
                 }
                 else
-                        console.log("Categoria ", tag.name, " já foi incluida!");
+                        console.log("Tag ", tag.name, " já foi incluida!");
 
             }) 
             

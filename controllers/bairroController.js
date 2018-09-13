@@ -46,7 +46,7 @@ class BairroController {
                         console.log("ERRO: bairro: ", bairro.name, " não foi incluido!");
                 }
                 else
-                        console.log("Categoria ", bairro.name, " já foi incluida!");
+                        console.log("Bairro ", bairro.name, " já foi incluida!");
 
             }) 
             
