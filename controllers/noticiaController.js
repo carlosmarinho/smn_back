@@ -32,11 +32,11 @@ class NoticiaController {
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
         
-        console.log("minhas noticias: ", stripe_noticias.data, "\n\n");
+        //console.log("minhas noticias: ", stripe_noticias.data, "\n\n");
         
         this.findMysqlNoticias(noticias => {
             let ar_noticias = noticias.map(noticia => {
-                console.log("\nnoticia: ", noticia);
+                //console.log("\nnoticia: ", noticia);
                 let has_noticia = this.getNoticiaByWpid(jwt.data.jwt, stripe_noticias.data, noticia.ID)
                 //console.log("\n\n\nnoticia: ", noticia, " \n\n----\n\n  has noticia: ", has_noticia.length);
                 if(has_noticia.length == 0){
@@ -60,28 +60,29 @@ class NoticiaController {
     async insertNoticia(jwt, noticia){
         let cidade = ObjectId("5b99723235e1ea4e64bbe68f");
 
-
         let obj = {
                 wpid: noticia.ID,
-                nome: noticia.name,
-                slug: slugify(noticia.name, {remove: /[*+~.()'"!:@]/g, lower: true}),
-                descricao: noticia.description,
-                cidade: cidade
+                titulo: noticia.post_title,
+                descricao: noticia.post_content,
+                slug: noticia.slug,
+                createdAt: noticia.post_date,
+                updatedAt: noticia.post_modified,
+                wp_user_id: noticia.post_author
             }    
 
-        console.log("obj: ", obj)
+        //console.log("obj: ", obj)
         let ret = await this.insertStrypeNoticia(jwt, obj);
         return ret;
     }
 
-    getNoticiaByWpid(jwt, noticias, wpid) {
+    getNoticiaByWpid(jwt, noticias, ID) {
     //    let noticias = await this.getNoticias(jwt)
 
         //console.log("meus noticias: ", noticias);
 
         return noticias.filter(noticia => {
-            console.log("\n", noticia.wpid , " --- ", wpid)
-            if(noticia.nome == name)
+            //console.log("\n ------------------------->>>>>>", noticia.wpid , " --- ", ID)
+            if(noticia.wpid == ID)
                 return noticia;
         })
     }
@@ -115,9 +116,18 @@ class NoticiaController {
 
 
     findMysqlNoticias(cb){
-        let sql = "SELECT t.term_id, t.name, t.slug, tt.description, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' " +
-        " WHERE description like 'Noticia%'" 
+
+
+        let sql = "SELECT ID, post_author, post_title, post_content, post_name as slug, post_date, post_modified " +
+        " FROM nkty_posts " +
+        " WHERE ID > 20000 AND ID < 50000 AND (post_status = 'publish' or post_status = 'published') and post_type = 'post' " +
+        "   and ID in ( " +
+        "       SELECT distinct( tr.object_id ) FROM nkty_term_relationships tr  " +
+        "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
+        "           inner join nkty_terms t on t.term_id = tt.term_id " +
+        "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
+        " ) order by ID asc limit 4000 ";
+        //"  ) limit 100";
 
         console.log("\n\n", sql, "\n\n\n")
         let noticia = mysqlJson.query( sql, (error, noticias) => {
