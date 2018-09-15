@@ -1,4 +1,5 @@
-const {ObjectId} = require('mongodb');
+const {ObjectID} = require('mongodb');
+var mongoose = require('mongoose');
 const _ = require ('lodash/core');
 const slugify = require('slugify')
 const download = require('image-downloader')
@@ -53,23 +54,29 @@ class CategoriaImageGuiaController {
                         imageInfo(filename, async (err, info) => {
                             if (err) return console.warn(err);
                             //console.log("\n\n\ninfo da image: ", info);
+
+                            console.log("\n\n\n********************************************");
+                            console.log(new ObjectID(cat._id))
+                            console.log("\n********************************************/n/n/n");
+
+                            let related = {
+                                    _id: new ObjectID(),
+                                    ref: cat._id,
+                                    kind: 'Categoria',
+                                    field: 'imagem_destacada'
+                                }
+                            console.log("\n\n\n------------related: ", related, " --------------\n\n\n")
+
                             let img_obj = {
                                 name: path.basename(filename),
                                 sha256: info.sha1,
-                                hash: uuid().replace(/-/g, ''),
-                                ext: info.ext,
+                                hash: path.parse(filename).name,
+                                ext: '.' + info.ext,
                                 mime: info.mime,
                                 size: info.bytes,
                                 url: path_image + path.basename(filename),
                                 provider: 'local',
-                                related: [
-                                    {
-                                        _id: new ObjectId(),
-                                        ref: cat._id,
-                                        kind: 'Categoria',
-                                        field: 'imagem_destacada'
-                                    }
-                                ]
+                                related: [related]
                             }
 
                             let img = await this.insertStrypeImage(jwt.data.jwt, img_obj);
@@ -77,12 +84,12 @@ class CategoriaImageGuiaController {
                             console.log("\n\n\n minha imagem: ", img);
                         })
 
-                        console.log(filename) // => /path/to/dest/image.jpg 
+                        //console.log(filename) // => /path/to/dest/image.jpg 
                     } catch (e) {
                     console.error("\n\n", e)
                     }
 
-                    console.log("\n no calllback: ", cat_cb[0]);
+                    //console.log("\n no calllback: ", cat_cb[0]);
                 }
             } )
         }) 
