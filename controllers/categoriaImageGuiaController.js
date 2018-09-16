@@ -1,5 +1,4 @@
-const {ObjectID} = require('mongodb');
-var mongoose = require('mongoose');
+const {ObjectId} = require('mongodb');
 const _ = require ('lodash/core');
 const slugify = require('slugify')
 const download = require('image-downloader')
@@ -7,13 +6,18 @@ const MysqlJson = require('mysql-json');
 const imageInfo = require('image-info');
 const path = require("path");
 const uuid = require('uuid/v4');
+const mysql = require('mysql');
 
-const mysqlJson = new MysqlJson({
-  host:'127.0.0.1',
-  user:'root',
-  password:'carlos',
-  database:'niteroi'
-});
+const mysql_con = {
+    host:'127.0.0.1',
+    user:'root',
+    password:'carlos',
+    database:'niteroi'
+}
+
+const mysqlJson = new MysqlJson(mysql_con);
+
+const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
@@ -55,17 +59,13 @@ class CategoriaImageGuiaController {
                             if (err) return console.warn(err);
                             //console.log("\n\n\ninfo da image: ", info);
 
-                            console.log("\n\n\n********************************************");
-                            console.log(new ObjectID(cat._id))
-                            console.log("\n********************************************/n/n/n");
-
+                           
                             let related = {
-                                    _id: new ObjectID(),
+                                    _id: new ObjectId(),
                                     ref: cat._id,
                                     kind: 'Categoria',
                                     field: 'imagem_destacada'
                                 }
-                            console.log("\n\n\n------------related: ", related, " --------------\n\n\n")
 
                             let img_obj = {
                                 name: path.basename(filename),
@@ -81,7 +81,13 @@ class CategoriaImageGuiaController {
 
                             let img = await this.insertStrypeImage(jwt.data.jwt, img_obj);
 
-                            console.log("\n\n\n minha imagem: ", img);
+                            let update = `UPDATE nkty_posts set imported = 1 where ID = ${cat_cb[0].ID}`;
+                            
+                            conn.query(update, err => {
+                                if(err)
+                                    console.log('o post de id ', cat_cb[0] , ' não foi marcado como importado \nErro:', err)
+                            });
+                            console.log("\n\n\n minha imagem: ", img_obj);
                         })
 
                         //console.log(filename) // => /path/to/dest/image.jpg 
@@ -189,7 +195,7 @@ class CategoriaImageGuiaController {
     }
 
     findMysqlCategory(cat, cb){
-        let sql = `SELECT * FROM nkty_posts WHERE post_type = 'attachment' and post_name = '${cat.slug_wp}' `
+        let sql = `SELECT * FROM nkty_posts WHERE imported = 0 and  post_type = 'attachment' and post_name = '${cat.slug_wp}' `
 
         //console.log("\n\n", sql, "\n\n\n")
         mysqlJson.query( sql, (error, category) => {
