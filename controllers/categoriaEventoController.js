@@ -11,7 +11,7 @@ const mysqlJson = new MysqlJson({
 
 const axios = require('axios');
 
-class CategoriaNewsController {
+class CategoriaEventoController {
     constructor(){
 
     }
@@ -62,12 +62,12 @@ class CategoriaNewsController {
         let obj = {
                 wpid: category.term_id,
                 nome: category.name,
-                slug: "noticia/" + slugify(category.name, {remove: /[*+~.()'"!:@]/g, lower: true}),
+                slug: "evento/" + category.slug,
                 slug_wp: category.slug,
                 descricao: category.description,
                 count: category.count,
-                tipo: 'notícia',
-                parent: category.parent
+                tipo: 'evento',
+                wp_parent_id: category.parent
             }    
 
         console.log("obj: ", obj)
@@ -117,8 +117,7 @@ class CategoriaNewsController {
 
     findMysqlCategorys(cb){
         let sql = "SELECT t.term_id, t.name, t.slug, tt.description, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' " +
-        " WHERE t.term_id > 41 and t.term_id < 81 or t.term_id in (16,17)" 
+        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'jv_events_category' "
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {
@@ -134,4 +133,4 @@ class CategoriaNewsController {
     }
 }
 
-module.exports = new CategoriaNewsController
+module.exports = new CategoriaEventoController
