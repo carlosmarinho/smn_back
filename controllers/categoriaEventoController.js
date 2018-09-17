@@ -2,12 +2,18 @@ const {ObjectId} = require('mongodb');
 const _ = require ('lodash/core');
 var slugify = require('slugify')
 const MysqlJson = require('mysql-json');
-const mysqlJson = new MysqlJson({
-  host:'127.0.0.1',
-  user:'root',
-  password:'carlos',
-  database:'niteroi'
-});
+const mysql = require('mysql');
+
+const mysql_con = {
+    host:'127.0.0.1',
+    user:'root',
+    password:'carlos',
+    database:'niteroi'
+}
+
+const mysqlJson = new MysqlJson(mysql_con);
+
+const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
@@ -40,8 +46,15 @@ class CategoriaEventoController {
                 let has_category = this.getCategoryByTermid(jwt.data.jwt, stripe_categorys.data, category.term_id)
                 //console.log("\n\n\ncategory: ", category, " \n\n----\n\n  has category: ", has_category.length);
                 if(has_category.length == 0){
-                    if( this.insertCategory(jwt.data.jwt, category) )
+                    if( this.insertCategory(jwt.data.jwt, category) ){
                         console.log("categoria: ", category.name, " incluido com sucesso!");
+                        let update = `UPDATE nkty_term_taxonomy set imported = 1 where imported = 0 and term_taxonomy_id = ${category.term_taxonomy_id}`;
+                        console.log("\n\nUPDATE: ", update, "\n")
+                        conn.query(update, err => {
+                            if(err)
+                                console.log('o post de id ', category.name[0] , ' não foi marcado como importado \nErro:', err)
+                        });
+                    }
                     else
                         console.log("ERRO: categoria: ", category.name, " não foi incluido!");
                 }
@@ -116,8 +129,8 @@ class CategoriaEventoController {
 
 
     findMysqlCategorys(cb){
-        let sql = "SELECT t.term_id, t.name, t.slug, tt.description, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'jv_events_category' "
+        let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.count FROM nkty_terms t " +
+        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.imported = 0 AND tt.taxonomy = 'jv_events_category' "
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {

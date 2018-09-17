@@ -3,10 +3,14 @@ const controller_cat = require('../controllers/categoriaNewsController')
 const controller_catevento = require('../controllers/categoriaEventoController')
 const controller_catguia = require('../controllers/categoriaGuiaController')
 const controller_catguia_image = require('../controllers/categoriaImageGuiaController')
+const controller_catevento_image = require('../controllers/categoriaImageEventoController')
 const controller_tag = require('../controllers/tagController')
 const controller_bairro = require('../controllers/bairroController')
 const controller_comentario = require('../controllers/comentarioController')
 const controller_noticia = require('../controllers/noticiaController')
+const controller_noticia_image = require('../controllers/noticiaImagemDestacadaController')
+const controller_noticia_categoria = require('../controllers/associaNoticiaCategoriaController')
+
 
 
 module.exports = (app, upload) => {
@@ -21,4 +25,7 @@ module.exports = (app, upload) => {
     app.get("/comentario/migrate", (req, res) => controller_comentario.migrate(req, res) )
     app.get("/noticia/migrate", (req, res) => controller_noticia.migrate(req, res) )
     app.get("/catguiaimage/migrate", (req, res) => controller_catguia_image.migrate(req, res) )
+    app.get("/cateventoimage/migrate", (req, res) => controller_catevento_image.migrate(req, res) )
+    app.get("/noticia_img_destacad/migrate", (req, res) => controller_noticia_image.migrate(req, res) )
+    app.get("/associa_noticia_categoria/migrate", (req, res) => controller_noticia_categoria.migrate(req, res) )
 }

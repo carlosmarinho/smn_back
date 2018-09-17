@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class CategoriaImageGuiaController {
+class CategoriaImageEventoController {
     constructor(){
 
     }
@@ -42,7 +42,7 @@ class CategoriaImageGuiaController {
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_categorys = await this.getCategorys(jwt.data.jwt)
         //console.log('stripe_categorys: ', stripe_categorys.data);
-        const path_image = '/uploads/guia-comercial/categoria/'
+        const path_image = '/uploads/evento/categoria/'
 
         stripe_categorys.data.map(cat => {
             this.findMysqlCategory(cat, async cat_cb => {
@@ -128,11 +128,11 @@ class CategoriaImageGuiaController {
         let obj = {
                 wpid: category.term_id,
                 nome: category.name,
-                slug: "guia/" + category.slug,
+                slug: "evento/" + category.slug,
                 slug_wp: category.slug,
                 descricao: category.description,
                 count: category.count,
-                tipo: 'guia-comercial',
+                tipo: 'evento',
                 wp_parent_id: category.parent
             }    
 
@@ -186,7 +186,7 @@ class CategoriaImageGuiaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/categoria?tipo=guia-comercial',  config);
+            let ret = await axios.get('http://localhost:1337/categoria?tipo=evento',  config);
             return ret;
         }
         catch(e){
@@ -212,4 +212,4 @@ class CategoriaImageGuiaController {
 
 }
 
-module.exports = new CategoriaImageGuiaController
+module.exports = new CategoriaImageEventoController

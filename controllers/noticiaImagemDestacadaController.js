@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class CategoriaImageGuiaController {
+class noticiaImagemDestacadaController {
     constructor(){
 
     }
@@ -40,19 +40,19 @@ class CategoriaImageGuiaController {
 
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
-        let stripe_categorys = await this.getCategorys(jwt.data.jwt)
-        //console.log('stripe_categorys: ', stripe_categorys.data);
-        const path_image = '/uploads/guia-comercial/categoria/'
+        let stripe_noticias = await this.getNoticias(jwt.data.jwt)
+        //console.log('stripe_noticias: ', stripe_noticias.data);
+        const path_image = '/uploads/noticia/destacada/'
 
-        stripe_categorys.data.map(cat => {
-            this.findMysqlCategory(cat, async cat_cb => {
-                if(cat_cb.length > 0){
+        stripe_noticias.data.map(noticia => {
+            this.findMysqlNoticia(noticia, async noticia_cb => {
+                if(noticia_cb.length > 0){
                     
                     let options = {
-                        url: cat_cb[0].guid,
+                        url: noticia_cb[0].guid,
                         dest: '/home/carlos/projects/work/node/smn_strapi/public' + path_image                  // Save to /path/to/dest/image.jpg
                     }
-                    console.log("\n\nmeu option: ", options);
+
                     try {
                         const { filename, image } = await download.image(options)
                         imageInfo(filename, async (err, info) => {
@@ -62,8 +62,8 @@ class CategoriaImageGuiaController {
                            
                             let related = {
                                     _id: new ObjectId(),
-                                    ref: cat._id,
-                                    kind: 'Categoria',
+                                    ref: noticia._id,
+                                    kind: 'Noticia',
                                     field: 'imagem_destacada'
                                 }
 
@@ -81,11 +81,11 @@ class CategoriaImageGuiaController {
 
                             let img = await this.insertStrypeImage(jwt.data.jwt, img_obj);
 
-                            let update = `UPDATE nkty_posts set imported = 1 where ID = ${cat_cb[0].ID}`;
+                            let update = `UPDATE nkty_posts set imported = 1 where ID = ${noticia_cb[0].ID}`;
                             
                             conn.query(update, err => {
                                 if(err)
-                                    console.log('o post de id ', cat_cb[0] , ' não foi marcado como importado \nErro:', err)
+                                    console.log('o post de id ', noticia_cb[0] , ' não foi marcado como importado \nErro:', err)
                             });
                             console.log("\n\n\n minha imagem: ", img_obj);
                         })
@@ -95,61 +95,25 @@ class CategoriaImageGuiaController {
                     console.error("\n\n", e)
                     }
 
-                    //console.log("\n no calllback: ", cat_cb[0]);
+                    //console.log("\n no calllback: ", noticia_cb[0]);
                 }
             } )
         }) 
-        
-        /* this.findMysqlCategorys(categorys => {
-            let ar_categorys = categorys.map(category => {
-                console.log("\ncategoria: ", category);
-                let has_category = this.getCategoryByTermid(jwt.data.jwt, stripe_categorys.data, category.term_id)
-                //console.log("\n\n\ncategory: ", category, " \n\n----\n\n  has category: ", has_category.length);
-                if(has_category.length == 0){
-                    if( this.insertCategory(jwt.data.jwt, category) )
-                        console.log("categoria: ", category.name, " incluido com sucesso!");
-                    else
-                        console.log("ERRO: categoria: ", category.name, " não foi incluido!");
-                }
-                else
-                        console.log("Categoria ", category.name, " já foi incluida!");
-
-            }) 
-            
-        }); */
-   
 
         res.json("Importação finalizada com sucesso");
         
     }
 
-    async insertCategory(jwt, category){
-        
-        let obj = {
-                wpid: category.term_id,
-                nome: category.name,
-                slug: "guia/" + category.slug,
-                slug_wp: category.slug,
-                descricao: category.description,
-                count: category.count,
-                tipo: 'guia-comercial',
-                wp_parent_id: category.parent
-            }    
+    
+    getNoticiaByTermid(jwt, noticias, term_id) {
+    //    let noticias = await this.getNoticias(jwt)
 
-        console.log("obj: ", obj)
-        let ret = await this.insertStrypeCategory(jwt, obj);
-        return ret;
-    }
+        //console.log("meus noticias: ", noticias);
 
-    getCategoryByTermid(jwt, categorys, term_id) {
-    //    let categorys = await this.getCategorys(jwt)
-
-        //console.log("meus categorys: ", categorys);
-
-        return categorys.filter(category => {
-            //console.log(category.categoryname , " --- ", categoryname)
-            if(category.wpid == term_id)
-                return category;
+        return noticias.filter(noticia => {
+            //console.log(noticia.noticianame , " --- ", noticianame)
+            if(noticia.wpid == term_id)
+                return noticia;
         })
     }
 
@@ -167,12 +131,12 @@ class CategoriaImageGuiaController {
         } 
     }
 
-    async insertStrypeCategory(jwt, category){
+    async insertStrypeNoticia(jwt, noticia){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.post('http://localhost:1337/categoria', category, config);
+            let ret = await axios.post('http://localhost:1337/noticia', noticia, config);
             //console.log(ret);
             return ret;
         }
@@ -181,12 +145,12 @@ class CategoriaImageGuiaController {
         } 
     }
 
-    async getCategorys(jwt){
+    async getNoticias(jwt){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/categoria?tipo=guia-comercial',  config);
+            let ret = await axios.get('http://localhost:1337/noticia',  config);
             return ret;
         }
         catch(e){
@@ -194,14 +158,18 @@ class CategoriaImageGuiaController {
         }
     }
 
-    findMysqlCategory(cat, cb){
-        let sql = `SELECT * FROM nkty_posts WHERE imported = 0 and  post_type = 'attachment' and post_name = '${cat.slug_wp}' `
+    findMysqlNoticia(noticia, cb){
+
+        console.log("\n\n\n Noticia: ", noticia);
+        let sql = ` SELECT p.* FROM nkty_posts p 
+        INNER JOIN nkty_postmeta pt on pt.meta_key = '_thumbnail_id' and pt.meta_value = p.ID
+        WHERE p.imported = 0 and p.post_type = 'attachment' and p.post_parent = ${noticia.wpid} `
 
         //console.log("\n\n", sql, "\n\n\n")
-        mysqlJson.query( sql, (error, category) => {
+        mysqlJson.query( sql, (error, noticia) => {
             
             if(!error){
-                cb(category);
+                cb(noticia);
             }
             else{
                 console.log("erro: ", error);
@@ -212,4 +180,4 @@ class CategoriaImageGuiaController {
 
 }
 
-module.exports = new CategoriaImageGuiaController
+module.exports = new noticiaImagemDestacadaController

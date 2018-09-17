@@ -2,12 +2,18 @@ const {ObjectId} = require('mongodb');
 const _ = require ('lodash/core');
 var slugify = require('slugify')
 const MysqlJson = require('mysql-json');
-const mysqlJson = new MysqlJson({
-  host:'127.0.0.1',
-  user:'root',
-  password:'carlos',
-  database:'niteroi'
-});
+const mysql = require('mysql');
+
+const mysql_con = {
+    host:'127.0.0.1',
+    user:'root',
+    password:'carlos',
+    database:'niteroi'
+}
+
+const mysqlJson = new MysqlJson(mysql_con);
+
+const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
@@ -40,8 +46,15 @@ class NoticiaController {
                 let has_noticia = this.getNoticiaByWpid(jwt.data.jwt, stripe_noticias.data, noticia.ID)
                 //console.log("\n\n\nnoticia: ", noticia, " \n\n----\n\n  has noticia: ", has_noticia.length);
                 if(has_noticia.length == 0){
-                    if( this.insertNoticia(jwt.data.jwt, noticia) )
-                        console.log("noticia: ", noticia.name, " incluido com sucesso!");
+                    if( this.insertNoticia(jwt.data.jwt, noticia) ) {
+                        console.log("noticia: ", noticia.post_title, " incluido com sucesso!");
+                        let update = `UPDATE nkty_posts set imported = 1 where post_type = 'post' and ID = ${noticia.ID}`;
+                        console.log("\n\nUPDATE: ", update, "\n")
+                        conn.query(update, err => {
+                            if(err)
+                                console.log('o post de id ', cat_cb[0] , ' não foi marcado como importado \nErro:', err)
+                        });
+                    }
                     else
                         console.log("ERRO: noticia: ", noticia.name, " não foi incluido!");
                 }
@@ -120,13 +133,13 @@ class NoticiaController {
 
         let sql = "SELECT ID, post_author, post_title, post_content, post_name as slug, post_date, post_modified " +
         " FROM nkty_posts " +
-        " WHERE ID > 20000 AND ID < 50000 AND (post_status = 'publish' or post_status = 'published') and post_type = 'post' " +
+        " WHERE imported = 0 and (post_status = 'publish' or post_status = 'published') and post_type = 'post' " +
         "   and ID in ( " +
         "       SELECT distinct( tr.object_id ) FROM nkty_term_relationships tr  " +
         "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
         "           inner join nkty_terms t on t.term_id = tt.term_id " +
         "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
-        " ) order by ID asc limit 4000 ";
+        " ) order by ID asc limit 100 ";
         //"  ) limit 100";
 
         console.log("\n\n", sql, "\n\n\n")
