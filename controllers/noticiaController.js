@@ -139,7 +139,7 @@ class NoticiaController {
         "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
         "           inner join nkty_terms t on t.term_id = tt.term_id " +
         "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
-        " ) order by ID asc limit 100 ";
+        " ) order by ID asc limit 1000 ";
         //"  ) limit 100";
 
         console.log("\n\n", sql, "\n\n\n")

@@ -4,12 +4,21 @@ const controller_catevento = require('../controllers/categoriaEventoController')
 const controller_catguia = require('../controllers/categoriaGuiaController')
 const controller_catguia_image = require('../controllers/categoriaImageGuiaController')
 const controller_catevento_image = require('../controllers/categoriaImageEventoController')
+
 const controller_tag = require('../controllers/tagController')
+
 const controller_bairro = require('../controllers/bairroController')
+
 const controller_comentario = require('../controllers/comentarioController')
+
 const controller_noticia = require('../controllers/noticiaController')
 const controller_noticia_image = require('../controllers/noticiaImagemDestacadaController')
 const controller_noticia_categoria = require('../controllers/associaNoticiaCategoriaController')
+const controller_noticia_tag = require('../controllers/associaNoticiaTagController')
+
+const controller_evento = require('../controllers/eventoController')
+const controller_evento_categoria = require('../controllers/associaEventoCategoriaController')
+const controller_evento_tag = require('../controllers/associaEventoTagController')
 
 
 
@@ -26,6 +35,12 @@ module.exports = (app, upload) => {
     app.get("/noticia/migrate", (req, res) => controller_noticia.migrate(req, res) )
     app.get("/catguiaimage/migrate", (req, res) => controller_catguia_image.migrate(req, res) )
     app.get("/cateventoimage/migrate", (req, res) => controller_catevento_image.migrate(req, res) )
+
     app.get("/noticia_img_destacad/migrate", (req, res) => controller_noticia_image.migrate(req, res) )
     app.get("/associa_noticia_categoria/migrate", (req, res) => controller_noticia_categoria.migrate(req, res) )
+    app.get("/associa_noticia_tag/migrate", (req, res) => controller_noticia_tag.migrate(req, res) )
+
+    app.get("/evento/migrate", (req, res) => controller_evento.migrate(req, res) )
+    app.get("/associa_evento_categoria/migrate", (req, res) => controller_evento_categoria.migrate(req, res) )
+    app.get("/associa_evento_tag/migrate", (req, res) => controller_evento_tag.migrate(req, res) )
 }

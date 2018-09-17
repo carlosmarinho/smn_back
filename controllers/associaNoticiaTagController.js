@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class associaNoticiaCategoriaController {
+class associaNoticiaTagController {
     constructor(){
 
     }
@@ -51,15 +51,15 @@ class associaNoticiaCategoriaController {
                     try {
                             console.log("Noticia::::: ", noticia_cb);
 
-                            let categories = [] 
+                            let tags = [] 
                             await Promise.all(noticia_cb.map(async news => {
-                                let cat =  await this.getCategoryByWpid(jwt.data.jwt, news.term_id)
-                                categories.push(cat.data[0]);
+                                let cat =  await this.getTagByWpid(jwt.data.jwt, news.term_id)
+                                tags.push(cat.data[0]);
                             }))
 
                         let obj = {
-                            categorias: categories,
-                            imported_category: true
+                            tags: tags,
+                            imported_tag: true
                         }
 
                         console.log("o objeto: ", obj);
@@ -126,12 +126,12 @@ class associaNoticiaCategoriaController {
         } 
     }
 
-    async getCategoryByWpid(jwt, wpid){
+    async getTagByWpid(jwt, wpid){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        //console.log(`\n\nPegando a categoria: http://localhost:1337/categoria?wpid=${wpid}`);
+        //console.log(`\n\nPegando a tag: http://localhost:1337/tag?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/categoria?wpid=${wpid}`,  config);
+            let ret = await axios.get(`http://localhost:1337/tag?wpid=${wpid}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -145,7 +145,7 @@ class associaNoticiaCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_tag=false&_start=0&_limit=100',  config);
             return ret;
         }
         catch(e){
@@ -160,7 +160,7 @@ class associaNoticiaCategoriaController {
         let sql = ` select p.ID, p.post_title, t.term_id, t.name, t.slug, tt.taxonomy, tt.term_taxonomy_id
         FROM nkty_posts p
         inner join nkty_term_relationships tr on p.ID = tr.object_id
-        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'category'
+        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'post_tag'
         inner join nkty_terms t on t.term_id = tt.term_id
         where t.name != 'Uncategorized' and tr.imported = 0
         and p.ID = ${noticia.wpid}`
@@ -180,4 +180,4 @@ class associaNoticiaCategoriaController {
 
 }
 
-module.exports = new associaNoticiaCategoriaController
+module.exports = new associaNoticiaTagController
