@@ -97,6 +97,8 @@ class EventoController {
                 recorrencia: recorrencia,
                 inicio: evento.inicio,
                 fim: evento.fim,
+                hora_inicio: evento.hora_inicio,
+                hora_fim: evento.hora_fim,
                 cidade: cidade,
                 imported_category: false,
                 imported_tag: false
@@ -129,7 +131,7 @@ class EventoController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error insert strypeevento: ", e.Error);
         } 
     }
 
@@ -142,7 +144,7 @@ class EventoController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error getEventos: ", e.Error);
         }
     }
 
@@ -155,9 +157,11 @@ class EventoController {
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'events_couvert' and post_id = p.ID) as couvert, " +
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'events_recurrency' and post_id = p.ID) as recorrencia, " +
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'begin_date' and post_id = p.ID) as inicio, " +
-        "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'end_date' and post_id = p.ID) as fim " +
+        "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'end_date' and post_id = p.ID) as fim, " +
+        "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'begin_hour' and post_id = p.ID) as hora_inicio, " +
+        "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'end_hour' and post_id = p.ID) as hora_fim " +
         " FROM nkty_posts p " +
-        " WHERE p.imported = 0 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'jv_events' " +
+        " WHERE p.imported = 1 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'jv_events' " +
         " order by ID asc limit 300 ";
         //"  ) limit 100";
 
@@ -168,7 +172,7 @@ class EventoController {
                 cb(eventos);
             }
             else{
-                console.log("erro: ", error);
+                console.log("erro mysql eventos: ", error);
             }
         })
         
