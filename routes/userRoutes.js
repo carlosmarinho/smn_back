@@ -19,6 +19,8 @@ const controller_noticia_tag = require('../controllers/associaNoticiaTagControll
 const controller_evento = require('../controllers/eventoController')
 const controller_evento_categoria = require('../controllers/associaEventoCategoriaController')
 const controller_evento_tag = require('../controllers/associaEventoTagController')
+const controller_evento_image = require('../controllers/eventoImagemDestacadaController')
+
 
 
 
@@ -36,11 +38,12 @@ module.exports = (app, upload) => {
     app.get("/catguiaimage/migrate", (req, res) => controller_catguia_image.migrate(req, res) )
     app.get("/cateventoimage/migrate", (req, res) => controller_catevento_image.migrate(req, res) )
 
-    app.get("/noticia_img_destacad/migrate", (req, res) => controller_noticia_image.migrate(req, res) )
+    app.get("/noticia_img_destacada/migrate", (req, res) => controller_noticia_image.migrate(req, res) )
     app.get("/associa_noticia_categoria/migrate", (req, res) => controller_noticia_categoria.migrate(req, res) )
     app.get("/associa_noticia_tag/migrate", (req, res) => controller_noticia_tag.migrate(req, res) )
 
     app.get("/evento/migrate", (req, res) => controller_evento.migrate(req, res) )
     app.get("/associa_evento_categoria/migrate", (req, res) => controller_evento_categoria.migrate(req, res) )
     app.get("/associa_evento_tag/migrate", (req, res) => controller_evento_tag.migrate(req, res) )
+    app.get("/evento_img_destacada/migrate", (req, res) => controller_evento_image.migrate(req, res) )
 }
