@@ -261,8 +261,8 @@ class eventoImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/evento',  config);
-            //let ret = await axios.get('http://localhost:1337/evento?wpid=158820',  config);
+            let ret = await axios.get('http://localhost:1337/evento?old_imagem_destacada=',  config);
+            //let ret = await axios.get('http://localhost:1337/evento?wpid=152634',  config);
             return ret;
         }
         catch(e){
@@ -293,7 +293,7 @@ class eventoImagemDestacadaController {
         //console.log("\n\n\n Evento: ", evento);
         let sql = ` SELECT p.* FROM nkty_posts p 
         INNER JOIN nkty_postmeta pt on pt.meta_value = p.ID
-        WHERE  p.post_type = 'attachment' and p.post_parent = ${evento.wpid} `
+        WHERE imported = 0 and p.post_type = 'attachment' and p.post_parent = ${evento.wpid} `
 
         console.log("\n\n", sql, "\n\n\n")
         mysqlJson.query( sql, (error, evento1) => {
