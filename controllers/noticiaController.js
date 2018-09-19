@@ -71,7 +71,7 @@ class NoticiaController {
     }
 
     async insertNoticia(jwt, noticia){
-        let cidade = ObjectId("5b99723235e1ea4e64bbe68f");
+        let cidade = ObjectId("5ba26f813a018f42215a36a0");
 
         let obj = {
                 wpid: noticia.ID,
@@ -138,7 +138,7 @@ class NoticiaController {
         "       SELECT distinct( tr.object_id ) FROM nkty_term_relationships tr  " +
         "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
         "           inner join nkty_terms t on t.term_id = tt.term_id " +
-        "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
+        "           where imported = 0 and (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
         " ) order by ID asc limit 1000 ";
         //"  ) limit 100";
 

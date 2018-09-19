@@ -50,7 +50,7 @@ class CategoriaImageEventoController {
                     
                     let options = {
                         url: cat_cb[0].guid,
-                        dest: '/home/carlos/projects/work/node/smn_strapi/public' + path_image                  // Save to /path/to/dest/image.jpg
+                        dest: '/home/carlos/projects/work/node/smn_strapi_new/public' + path_image                  // Save to /path/to/dest/image.jpg
                     }
                     console.log("\n\nmeu option: ", options);
                     try {

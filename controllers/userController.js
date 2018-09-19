@@ -63,7 +63,7 @@ class UserController {
 
     async insertUser(jwt, user){
         
-        let role = ObjectId("5b98592d02259e0f7f41a022");
+        let role = ObjectId("5ba26f813a018f42215a36a0");
         let obj = {
                 username: user.user_login,
                 email: user.user_email,

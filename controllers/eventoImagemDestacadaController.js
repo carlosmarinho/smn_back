@@ -299,7 +299,7 @@ class eventoImagemDestacadaController {
         mysqlJson.query( sql, (error, evento1) => {
             
             if(!error){
-                if(evento.length > 0){
+                if(evento1.length > 0){
                     cb(evento1);
                 }
                 else{

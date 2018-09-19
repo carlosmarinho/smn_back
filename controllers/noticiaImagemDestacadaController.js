@@ -48,7 +48,7 @@ class noticiaImagemDestacadaController {
         const path_image = '/uploads/noticia/destacada/';
         let options = {
             url: url,
-            dest: '/home/carlos/projects/work/node/smn_strapi/public' + path_image                  // Save to /path/to/dest/image.jpg
+            dest: '/home/carlos/projects/work/node/smn_strapi_new/public' + path_image                  // Save to /path/to/dest/image.jpg
         }
 
         try {
@@ -99,9 +99,8 @@ class noticiaImagemDestacadaController {
     async migrate(req, res){
 
         let jwt = await this.authenticate();
-        //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
-        //console.log('stripe_noticias: ', stripe_noticias.data);
+        console.log('stripe_noticias: ', stripe_noticias.data);
         
 
         stripe_noticias.data.map(noticia => {
@@ -180,7 +179,7 @@ class noticiaImagemDestacadaController {
                     
                     let options = {
                         url: noticia_cb[0].guid,
-                        dest: '/home/carlos/projects/work/node/smn_strapi/public' + path_image                  // Save to /path/to/dest/image.jpg
+                        dest: '/home/carlos/projects/work/node/smn_strapi_new/public' + path_image                  // Save to /path/to/dest/image.jpg
                     }
 
                     try {
@@ -268,6 +267,7 @@ class noticiaImagemDestacadaController {
     async insertStrypeImage(jwt, image){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
+        //console.log("vai inserir a imagem no upload file: ", image)
         //console.log("\n\nconfig: ", config);
         try{
             let ret = await axios.post('http://localhost:1337/uploadfile', image, config);
@@ -298,7 +298,8 @@ class noticiaImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?old_imagem_destacada=',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?_limit=100&old_imagem_destacada=',  config);
+            //let ret = await axios.get('http://localhost:1337/noticia?wpid=407',  config);
             return ret;
         }
         catch(e){
@@ -326,16 +327,16 @@ class noticiaImagemDestacadaController {
 
     findMysqlNoticia(noticia, cb){
 
-        console.log("\n\n\n Noticia: ", noticia);
+        //console.log("\n\n\n Noticia: ", noticia);
         let sql = ` SELECT p.* FROM nkty_posts p 
         INNER JOIN nkty_postmeta pt on pt.meta_value = p.ID
         WHERE p.imported = 0 and p.post_type = 'attachment' and p.post_parent = ${noticia.wpid} `
 
         //console.log("\n\n", sql, "\n\n\n")
-        mysqlJson.query( sql, (error, noticia) => {
+        mysqlJson.query( sql, (error, noticia1) => {
             
             if(!error){
-                if(noticia.length > 0){
+                if(noticia1.length > 0){
                     cb(noticia1);
                 }
                 else{

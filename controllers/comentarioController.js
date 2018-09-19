@@ -58,7 +58,7 @@ class ComentarioController {
     }
 
     async insertComentario(jwt, comentario){
-        let cidade = ObjectId("5b99723235e1ea4e64bbe68f");
+        let cidade = ObjectId("5ba26f813a018f42215a36a0");
 
 
         let obj = {
