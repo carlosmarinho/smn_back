@@ -86,7 +86,7 @@ class GuiaController {
                 updatedAt: guia.post_modified,
                 wp_user_id: guia.post_author,
                 endereco: guia.endereco,
-                complemento: guia.omplemento,
+                complemento: guia.complemento,
                 cep: guia.cep,
                 telefone: guia.telefone,
                 celular: guia.celular,
@@ -168,7 +168,7 @@ class GuiaController {
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'jv_item_twitter' and post_id = p.ID order by post_id desc limit 1) as twitter, " +
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'javo_this_exist_no_more_item' and post_id = p.ID order by post_id desc limit 1) as nao_existe_mais " +
         " FROM nkty_posts p " +
-        " WHERE p.imported = 1 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'item' " +
+        " WHERE p.imported = 0 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'item' " +
         " order by ID asc limit 300 ";
         //"  ) limit 100";
 

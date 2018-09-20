@@ -54,8 +54,13 @@ class associaNoticiaCategoriaController {
                             let categories = [] 
                             await Promise.all(noticia_cb.map(async news => {
                                 let cat =  await this.getCategoryByWpid(jwt.data.jwt, news.term_id)
-                                categories.push(cat.data[0]);
+                                if(cat.data.length > 0)
+                                    categories.push(cat.data[0]);
                             }))
+
+                        if(categories.length == 0 )
+                            return;
+
 
                         let obj = {
                             categorias: categories,

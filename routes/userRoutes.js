@@ -22,7 +22,8 @@ const controller_evento_tag = require('../controllers/associaEventoTagController
 const controller_evento_image = require('../controllers/eventoImagemDestacadaController')
 
 const controller_guia = require('../controllers/guiaController')
-
+const controller_guia_categoria = require('../controllers/associaGuiaCategoriaController')
+const controller_guia_image = require('../controllers/guiaImagemDestacadaController')
 
 module.exports = (app, upload) => {
   
@@ -48,4 +49,6 @@ module.exports = (app, upload) => {
     app.get("/evento_img_destacada/migrate", (req, res) => controller_evento_image.migrate(req, res) )
 
     app.get("/guia/migrate", (req, res) => controller_guia.migrate(req, res) )
+    app.get("/associa_guia_categoria/migrate", (req, res) => controller_guia_categoria.migrate(req, res) )
+    app.get("/guia_img_destacada/migrate", (req, res) => controller_guia_image.migrate(req, res) )
 }

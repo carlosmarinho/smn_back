@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class eventoImagemDestacadaController {
+class guiaImagemDestacadaController {
     constructor(){
 
     }
@@ -33,19 +33,19 @@ class eventoImagemDestacadaController {
     async authenticate(){
         let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: '3ngenhoc2' })
         
-        return ret;
+        return  ret;
     }
 
-    async downloadImageAndSave(jwt, evento, url, ID, evento_id ){
+    async downloadImageAndSave(jwt, guia, url, ID, guia_id ){
         if(! ID){
-            console.log("\n\n\nId não está definido no downloadImageAndSave então não vai atualizar a imagem do evento\n\n");
+            console.log("\n\n\nId não está definido no downloadImageAndSave então não vai atualizar a imagem do guia\n\n");
             return false;
         }
 
-        await this.updateStrypeEvento(jwt.data.jwt, evento_id, {old_imagem_destacada: url});
+        await this.updateStrypeGuia(jwt.data.jwt, guia_id, {old_imagem_destacada: url});
 
 
-        const path_image = '/uploads/evento/destacada/';
+        const path_image = '/uploads/guia/destacada/';
         let options = {
             url: url,
             dest: '/home/carlos/projects/work/node/smn_strapi_new/public' + path_image                  // Save to /path/to/dest/image.jpg
@@ -60,8 +60,8 @@ class eventoImagemDestacadaController {
                
                 let related = {
                         _id: new ObjectId(),
-                        ref: evento._id,
-                        kind: 'Evento',
+                        ref: guia._id,
+                        kind: 'Guia',
                         field: 'imagem_destacada'
                 }
 
@@ -86,7 +86,7 @@ class eventoImagemDestacadaController {
                     if(err)
                         console.log('o post de id ', ID , ' não foi marcado como importado \nErro:', err)
                 });
-                console.log("\n\n\n Inseriu a imagem do evento" , evento.titulo , " minha imagem: ", url);
+                console.log("\n\n\n Inseriu a imagem do guia" , guia.titulo , " minha imagem: ", url);
             })
 
             //console.log(filename) // => /path/to/dest/image.jpg 
@@ -100,95 +100,63 @@ class eventoImagemDestacadaController {
 
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
-        let stripe_eventos = await this.getEventos(jwt.data.jwt)
-        //console.log('stripe_eventos: ', stripe_eventos.data);
+        let stripe_guias = await this.getGuias(jwt.data.jwt)
+        //console.log('stripe_guias: ', stripe_guias.data);
         
 
-        stripe_eventos.data.map(evento => {
+        stripe_guias.data.map(guia => {
             
-            this.findMysqlEvento(evento, async evento_cb => {
-                console.log("O evento: ", evento.titulo, " dentro já do mysql \n")
-                if(evento_cb.length > 0){
-                        this.getMysqlPostMeta(evento_cb[0].ID, async evento_cb1 => {
+            this.findMysqlGuia(guia, async guia_cb => {
+                console.log("O guia: ", guia.titulo, " dentro já do mysql \n")
+                if(guia_cb.length > 0){
+                        this.getMysqlPostMeta(guia_cb[0].ID, async guia_cb1 => {
                             let guid = '';
-                            if(evento_cb1.length > 0){
+                            if(guia_cb1.length > 0){
                                 let s3 = false;
                                 let attached = false;
-                                evento_cb1.map(ev => {
+                                guia_cb1.map(ev => {
                                     if(ev.meta_key == 'amazonS3_info'){
                                         s3 = true;
                                         guid = ev.meta_value;
                                         guid = "http://soumaisniteroi.com.br.s3-sa-east-1.amazonaws.com/" + guid.split("key")[1].split(':"')[1].split('";')[0]
 
-                                        console.log("\n\nEvento ", evento.titulo , " vai atualizar image do S3 e ID: ", evento_cb[0].ID);
+                                        console.log("\n\nGuia ", guia.titulo , " vai atualizar image do S3 e ID: ", guia_cb[0].ID);
 
-                                        this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, evento._id)
+                                        this.downloadImageAndSave(jwt, guia, guid, guia_cb[0].ID, guia._id)
                                         return;
                                     }
                                 })
 
                                 if(!s3){
-                                    evento_cb1.map(ev => {
+                                    guia_cb1.map(ev => {
                                         if(ev.meta_key == '_wp_attached_file'){
                                             attached = true;
                                             guid = ev.meta_value;
                                             guid = "http://soumaisniteroi.com.br/wp-content/uploads/" + guid
         
-                                            console.log("\n\n ", evento.titulo , " vai atualizar image do ATTACHED e ID: ", evento_cb[0].ID);
-                                            this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, evento._id)
+                                            console.log("\n\n ", guia.titulo , " vai atualizar image do ATTACHED e ID: ", guia_cb[0].ID);
+                                            this.downloadImageAndSave(jwt, guia, guid, guia_cb[0].ID, guia._id)
                                             return;
                                         }
                                     })
                                 }
 
                                 if( !s3 && !attached){
-                                    if(evento_cb[0].guid.includes('.jpg') || evento_cb[0].guid.includes('.jpeg') || 
-                                        evento_cb[0].guid.includes('.png') || evento_cb[0].guid.includes('.gif') || 
-                                        evento_cb[0].guid.includes('.tif') || evento_cb[0].guid.includes('.bmp') || 
-                                        evento_cb[0].guid.includes('.tiff')
+                                    if(guia_cb[0].guid.includes('.jpg') || guia_cb[0].guid.includes('.jpeg') || 
+                                        guia_cb[0].guid.includes('.png') || guia_cb[0].guid.includes('.gif') || 
+                                        guia_cb[0].guid.includes('.tif') || guia_cb[0].guid.includes('.bmp') || 
+                                        guia_cb[0].guid.includes('.tiff')
                                     ){
-                                        console.log("\n\n ", evento.titulo , " vai atualizar image direto do post.GUID e ID: ", evento_cb[0].ID);
-                                        this.downloadImageAndSave(jwt, evento, evento_cb[0].guid, evento_cb[0].id, evento._id);
+                                        console.log("\n\n ", guia.titulo , " vai atualizar image direto do post.GUID e ID: ", guia_cb[0].ID);
+                                        this.downloadImageAndSave(jwt, guia, guia_cb[0].guid, guia_cb[0].id, guia._id);
                                     }
                                 }
 
-                                /* if(evento_cb1[0].meta_key == 'amazonS3_info'){
-                                    guid = evento_cb1[0].meta_value;
-                                    guid = "http://soumaisniteroi.com.br.s3-sa-east-1.amazonaws.com/" + guid.split("key")[1].split(':"')[1].split('";')[0]
-
-                                    this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, guid)
-                                }
-                                else if(evento_cb1[1].meta_key == 'amazonS3_info') {
-                                    guid = evento_cb1[1].meta_value;
-                                    guid = "http://soumaisniteroi.com.br.s3-sa-east-1.amazonaws.com/" + guid.split("key")[1].split(':"')[1].split('";')[0]
-                                    
-                                    this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, guid)
-                                }
-                                else if(evento_cb1[2].meta_key == 'amazonS3_info') {
-                                    guid = evento_cb1[2].meta_value;
-                                    guid = "http://soumaisniteroi.com.br.s3-sa-east-1.amazonaws.com/" + guid.split("key")[1].split(':"')[1].split('";')[0]
-                                    
-                                    this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, guid)
-                                }
-                                else if(evento_cb1[0].meta_key == '_wp_attached_file'){
-                                    guid = evento_cb1[0].meta_value;
-                                    guid = "http://soumaisniteroi.com.br/wp-content/uploads/" + guid
-
-                                    this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, guid)
-                                }
-                                else if(evento_cb1[1].meta_key == '_wp_attached_file'){
-                                    guid = evento_cb1[1].meta_value;
-                                    guid = "http://soumaisniteroi.com.br/wp-content/uploads/" + guid
-
-                                    this.downloadImageAndSave(jwt, evento, guid, evento_cb[0].ID, guid)
-                                } */
                             }
                         })
 
                     
-
-                    
-                    //console.log("\n no calllback: ", evento_cb[0]);
+                    //console.log("\n no calllback: ", guia_cb[0]);
                 }
             } )
         }) 
@@ -198,29 +166,29 @@ class eventoImagemDestacadaController {
     }
 
     
-    getEventoByTermid(jwt, eventos, term_id) {
-    //    let eventos = await this.getEventos(jwt)
+    getGuiaByTermid(jwt, guias, term_id) {
+    //    let guias = await this.getGuias(jwt)
 
-        //console.log("meus eventos: ", eventos);
+        //console.log("meus guias: ", guias);
 
-        return eventos.filter(evento => {
-            //console.log(evento.eventoname , " --- ", eventoname)
-            if(evento.wpid == term_id)
-                return evento;
+        return guias.filter(guia => {
+            //console.log(guia.guianame , " --- ", guianame)
+            if(guia.wpid == term_id)
+                return guia;
         })
     }
 
-    async updateStrypeEvento(jwt, evento_id, obj){
+    async updateStrypeGuia(jwt, guia_id, obj){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        if(!evento_id)
+        if(!guia_id)
         {
-            console.log("\n\n\nId não está definido não vai atualizar o evento\n\n");
+            console.log("\n\n\nId não está definido não vai atualizar o guia\n\n");
             return false;
         }
         //console.log("\n\nconfig: ", config);
         try{
-            console.log("\nId: " , evento_id, " Vai atualizar a imagem: ", obj )
-            let ret = await axios.put(`http://localhost:1337/evento/${evento_id}`, obj, config);
+            console.log("\nId: " , guia_id, " Vai atualizar a imagem: ", obj )
+            let ret = await axios.put(`http://localhost:1337/guia/${guia_id}`, obj, config);
             return ret;
         }
         catch(e){
@@ -242,12 +210,12 @@ class eventoImagemDestacadaController {
         } 
     }
 
-    async insertStrypeEvento(jwt, evento){
+    async insertStrypeGuia(jwt, guia){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.post('http://localhost:1337/evento', evento, config);
+            let ret = await axios.post('http://localhost:1337/guia', guia, config);
             //console.log(ret);
             return ret;
         }
@@ -256,13 +224,13 @@ class eventoImagemDestacadaController {
         } 
     }
 
-    async getEventos(jwt){
+    async getGuias(jwt){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/evento?old_imagem_destacada=',  config);
-            //let ret = await axios.get('http://localhost:1337/evento?wpid=152634',  config);
+            let ret = await axios.get('http://localhost:1337/guia?_start=1&_limit=200&old_imagem_destacada=',  config);
+            //let ret = await axios.get('http://localhost:1337/guia?wpid=152634',  config);
             return ret;
         }
         catch(e){
@@ -277,10 +245,10 @@ class eventoImagemDestacadaController {
         order by meta_key asc`
 
         //console.log("\n\nquery-sql: ", sql, "\n\n\n")
-        mysqlJson.query( sql, (error, evento) => {
+        mysqlJson.query( sql, (error, guia) => {
             
             if(!error){
-                cb(evento);
+                cb(guia);
             }
             else{
                 console.log("erro: ", error);
@@ -288,28 +256,28 @@ class eventoImagemDestacadaController {
         })
     }
 
-    findMysqlEvento(evento, cb){
+    findMysqlGuia(guia, cb){
 
-        //console.log("\n\n\n Evento: ", evento);
+        //console.log("\n\n\n Guia: ", guia);
         let sql = ` SELECT p.* FROM nkty_posts p 
         INNER JOIN nkty_postmeta pt on pt.meta_value = p.ID
-        WHERE imported = 0 and p.post_type = 'attachment' and p.post_parent = ${evento.wpid} `
+        WHERE imported = 0 and p.post_type = 'attachment' and p.post_parent = ${guia.wpid} `
 
         console.log("\n\n", sql, "\n\n\n")
-        mysqlJson.query( sql, (error, evento1) => {
+        mysqlJson.query( sql, (error, guia1) => {
             
             if(!error){
-                if(evento1.length > 0){
-                    cb(evento1);
+                if(guia1.length > 0){
+                    cb(guia1);
                 }
                 else{
-                    console.log("O Evento é vazio");
+                    console.log("O Guia é vazio");
                     let sql = `SELECT p.* FROM nkty_posts p 
-                    WHERE p.id = ( SELECT pt.meta_value FROM nkty_postmeta pt WHERE  pt.meta_key = '_thumbnail_id' and pt.post_id = ${evento.wpid} ) `
-                    console.log("segunda query do mysql evento: ", sql);
-                    mysqlJson.query( sql, (error, evento2) => {
+                    WHERE p.id = ( SELECT pt.meta_value FROM nkty_postmeta pt WHERE  pt.meta_key = '_thumbnail_id' and pt.post_id = ${guia.wpid} ) `
+                    console.log("segunda query do mysql guia: ", sql);
+                    mysqlJson.query( sql, (error, guia2) => {
                         if(!error){
-                            cb(evento2)
+                            cb(guia2)
                         }
                         else{
                             console.log("erro na segunda query: ", error)
@@ -326,4 +294,4 @@ class eventoImagemDestacadaController {
 
 }
 
-module.exports = new eventoImagemDestacadaController
+module.exports = new guiaImagemDestacadaController
