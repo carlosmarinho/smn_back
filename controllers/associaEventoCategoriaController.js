@@ -58,8 +58,10 @@ class associaEventoCategoriaController {
                                 categories.push(cat.data[0]);
                         }))
 
-                        if(categories.length == 0 )
+                        if(categories.length == 0 ) {
+                            await this.updateStrypeAssociacao(jwt.data.jwt, evento._id, {imported_category: true});
                             return
+                        }
 
                         let obj = {
                             categorias: categories,

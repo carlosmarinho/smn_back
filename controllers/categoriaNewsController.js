@@ -129,7 +129,7 @@ class CategoriaNewsController {
 
 
     findMysqlCategorys(cb){
-        let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.count FROM nkty_terms t " +
+        let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.parent, tt.count FROM nkty_terms t " +
         " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' AND tt.imported = 0 " +
         " WHERE t.term_id > 37 and t.term_id < 81 or t.term_id in (16,17)" 
 

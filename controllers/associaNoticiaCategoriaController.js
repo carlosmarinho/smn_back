@@ -45,8 +45,10 @@ class associaNoticiaCategoriaController {
 
         stripe_noticias.data.map(noticia => {
             this.findMysqlNoticia(noticia, async noticia_cb => {
-
-                if(noticia_cb.length > 0){
+                if(noticia_cb.length == 0){
+                    await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_category: true});
+                }
+                else if(noticia_cb.length > 0){
 
                     try {
                             console.log("Noticia::::: ", noticia_cb);
@@ -58,8 +60,10 @@ class associaNoticiaCategoriaController {
                                     categories.push(cat.data[0]);
                             }))
 
-                        if(categories.length == 0 )
+                        if(categories.length == 0 ){
+                            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_category: true});
                             return;
+                        }
 
 
                         let obj = {
@@ -150,7 +154,8 @@ class associaNoticiaCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
+            //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=100',  config);
             return ret;
         }
         catch(e){

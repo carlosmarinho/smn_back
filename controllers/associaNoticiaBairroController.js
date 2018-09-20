@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class associaNoticiaTagController {
+class associaNoticiaCategoriaController {
     constructor(){
 
     }
@@ -41,32 +41,38 @@ class associaNoticiaTagController {
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
-        console.log('stripe_noticias: ', stripe_noticias.data);
+        //console.log('stripe_noticias: ', stripe_noticias.data);
 
         stripe_noticias.data.map(noticia => {
             this.findMysqlNoticia(noticia, async noticia_cb => {
-
-                if(noticia_cb.length > 0){
+                console.log("vai ver a noticia de id", noticia_cb);
+                if(noticia_cb.length == 0){
+                    await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_bairro: true});
+                }
+                else if(noticia_cb.length > 0){
 
                     try {
-                        console.log("Noticia::::: ", noticia_cb);
+                            //console.log("Noticia::::: ", noticia_cb);
 
-                        let tags = [] 
-                        await Promise.all(noticia_cb.map(async news => {
-                            let cat =  await this.getTagByWpid(jwt.data.jwt, news.term_id)
-                            if(cat.data.length > 0)
-                                tags.push(cat.data[0]);
-                        }))
+                            let bairros = [] 
+                            await Promise.all(noticia_cb.map(async news => {
+                                let cat =  await this.getBairroByWpid(jwt.data.jwt, news.term_id)
+                                
+                                console.log('cat', cat);
+                                if(cat.data.length > 0)
+                                    bairros.push(cat.data[0]);
+                            }))
 
-                        if(tags.length == 0 ){
-                            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_tag: true});
+                        if(bairros.length == 0 ){
+                            console.log("hum está caindo aqui");
+                            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_bairro: true});
                             return;
                         }
 
 
                         let obj = {
-                            tags: tags,
-                            imported_tag: true
+                            bairros: bairros,
+                            imported_bairro: true
                         }
 
                         console.log("o objeto: ", obj);
@@ -112,6 +118,7 @@ class associaNoticiaTagController {
         //console.log("\n\nconfig: ", config);
         try{
             let ret = await axios.put(`http://localhost:1337/noticia/${noticia_id}`, obj, config);
+            
             return ret;
         }
         catch(e){
@@ -119,26 +126,14 @@ class associaNoticiaTagController {
         } 
     }
 
-    async insertStrypeNoticia(jwt, noticia){
-        let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        
-        //console.log("\n\nconfig: ", config);
-        try{
-            let ret = await axios.post('http://localhost:1337/noticia', noticia, config);
-            //console.log(ret);
-            return ret;
-        }
-        catch(e){
-            console.log("\n\n\n error: ", e);
-        } 
-    }
+  
 
-    async getTagByWpid(jwt, wpid){
+    async getBairroByWpid(jwt, wpid){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        //console.log(`\n\nPegando a tag: http://localhost:1337/tag?wpid=${wpid}`);
+        //console.log(`\n\nPegando o bairro: http://localhost:1337/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/tag?wpid=${wpid}`,  config);
+            let ret = await axios.get(`http://localhost:1337/bairro?wpid=${wpid}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -152,7 +147,10 @@ class associaNoticiaTagController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?imported_tag=false&_start=0&_limit=100',  config);
+            //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_bairro=false&_limit=500',  config);
+            //let ret = await axios.get('http://localhost:1337/noticia?wpid=2465&_limit=100',  config);
+
             return ret;
         }
         catch(e){
@@ -167,9 +165,9 @@ class associaNoticiaTagController {
         let sql = ` select p.ID, p.post_title, t.term_id, t.name, t.slug, tt.taxonomy, tt.term_taxonomy_id
         FROM nkty_posts p
         inner join nkty_term_relationships tr on p.ID = tr.object_id
-        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'post_tag'
+        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'category'
         inner join nkty_terms t on t.term_id = tt.term_id
-        where t.name != 'Uncategorized' and tr.imported = 0
+        where t.name != 'Uncategorized' and tr.imported = 0 and description like 'Bairro%'
         and p.ID = ${noticia.wpid}`
 
         console.log("\n\n", sql, "\n\n\n")
@@ -187,4 +185,4 @@ class associaNoticiaTagController {
 
 }
 
-module.exports = new associaNoticiaTagController
+module.exports = new associaNoticiaCategoriaController

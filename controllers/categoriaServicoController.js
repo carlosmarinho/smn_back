@@ -17,7 +17,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class CategoriaEventoController {
+class CategoriaServicoController {
     constructor(){
 
     }
@@ -75,13 +75,13 @@ class CategoriaEventoController {
         let obj = {
                 wpid: category.term_id,
                 nome: category.name,
-                slug: "evento/" + category.slug,
+                slug: "guia/" + category.slug,
                 slug_wp: category.slug,
                 descricao: category.description,
                 count: category.count,
-                tipo: 'evento',
+                tipo: 'guia',
                 wp_parent_id: category.parent
-            }    
+        }    
 
         console.log("obj: ", obj)
         let ret = await this.insertStrypeCategory(jwt, obj);
@@ -130,7 +130,7 @@ class CategoriaEventoController {
 
     findMysqlCategorys(cb){
         let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.parent, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.imported = 0 AND tt.taxonomy = 'jv_events_category' "
+        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.imported = 0 AND tt.taxonomy = 'servico_category' "
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {
@@ -146,4 +146,4 @@ class CategoriaEventoController {
     }
 }
 
-module.exports = new CategoriaEventoController
+module.exports = new CategoriaServicoController

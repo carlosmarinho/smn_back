@@ -21,7 +21,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class associaEventoTagController {
+class associaEventoCategoriaController {
     constructor(){
 
     }
@@ -41,30 +41,38 @@ class associaEventoTagController {
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_eventos = await this.getEventos(jwt.data.jwt)
-        console.log('stripe_eventos: ', stripe_eventos.data);
+        //console.log('stripe_eventos: ', stripe_eventos.data);
 
         stripe_eventos.data.map(evento => {
             this.findMysqlEvento(evento, async evento_cb => {
-
-                if(evento_cb.length > 0){
+                console.log("vai ver a evento de id", evento_cb);
+                if(evento_cb.length == 0){
+                    await this.updateStrypeAssociacao(jwt.data.jwt, evento._id, {imported_bairro: true});
+                }
+                else if(evento_cb.length > 0){
 
                     try {
+                            //console.log("Evento::::: ", evento_cb);
 
-                        let tags = [] 
-                        await Promise.all(evento_cb.map(async news => {
-                            let cat =  await this.getTagByWpid(jwt.data.jwt, news.term_id)
-                            if(cat.data.length > 0)
-                                tags.push(cat.data[0]);
-                        }))
+                            let bairros = [] 
+                            await Promise.all(evento_cb.map(async news => {
+                                let cat =  await this.getBairroBySlug(jwt.data.jwt, news.slug)
+                                
+                                console.log('cat', cat);
+                                if(cat.data.length > 0)
+                                    bairros.push(cat.data[0]);
+                            }))
 
-                        if(tags.length == 0 ){
-                            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_tag: true});
+                        if(bairros.length == 0 ){
+                            console.log("hum está caindo aqui");
+                            await this.updateStrypeAssociacao(jwt.data.jwt, evento._id, {imported_bairro: true});
                             return;
                         }
 
+
                         let obj = {
-                            tags: tags,
-                            imported_tag: true
+                            bairros: bairros,
+                            imported_bairro: true
                         }
 
                         console.log("o objeto: ", obj);
@@ -110,6 +118,7 @@ class associaEventoTagController {
         //console.log("\n\nconfig: ", config);
         try{
             let ret = await axios.put(`http://localhost:1337/evento/${evento_id}`, obj, config);
+            
             return ret;
         }
         catch(e){
@@ -117,26 +126,14 @@ class associaEventoTagController {
         } 
     }
 
-    async insertStrypeEvento(jwt, evento){
-        let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        
-        //console.log("\n\nconfig: ", config);
-        try{
-            let ret = await axios.post('http://localhost:1337/evento', evento, config);
-            //console.log(ret);
-            return ret;
-        }
-        catch(e){
-            console.log("\n\n\n error: ", e);
-        } 
-    }
+  
 
-    async getTagByWpid(jwt, wpid){
+    async getBairroBySlug(jwt, slug){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        //console.log(`\n\nPegando a tag: http://localhost:1337/tag?wpid=${wpid}`);
+        //console.log(`\n\nPegando o bairro: http://localhost:1337/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/tag?wpid=${wpid}`,  config);
+            let ret = await axios.get(`http://localhost:1337/bairro?slug=${slug}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -150,7 +147,10 @@ class associaEventoTagController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/evento?imported_tag=false&_start=0&_limit=100',  config);
+            //let ret = await axios.get('http://localhost:1337/evento?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/evento?imported_bairro=false&_limit=500',  config);
+            //let ret = await axios.get('http://localhost:1337/evento?wpid=2465&_limit=100',  config);
+
             return ret;
         }
         catch(e){
@@ -165,9 +165,9 @@ class associaEventoTagController {
         let sql = ` select p.ID, p.post_title, t.term_id, t.name, t.slug, tt.taxonomy, tt.term_taxonomy_id
         FROM nkty_posts p
         inner join nkty_term_relationships tr on p.ID = tr.object_id
-        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'post_tag'
+        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'item_location'
         inner join nkty_terms t on t.term_id = tt.term_id
-        where t.name != 'Uncategorized' and tr.imported = 0
+        where t.name != 'Uncategorized' and tr.imported = 0 
         and p.ID = ${evento.wpid}`
 
         console.log("\n\n", sql, "\n\n\n")
@@ -185,4 +185,4 @@ class associaEventoTagController {
 
 }
 
-module.exports = new associaEventoTagController
+module.exports = new associaEventoCategoriaController

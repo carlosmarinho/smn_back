@@ -138,7 +138,7 @@ class NoticiaController {
         "       SELECT distinct( tr.object_id ) FROM nkty_term_relationships tr  " +
         "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
         "           inner join nkty_terms t on t.term_id = tt.term_id " +
-        "           where imported = 0 and (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18)" +
+        "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18) or tt.description like 'Bairro%'" +
         " ) order by ID asc limit 1000 ";
         //"  ) limit 100";
 

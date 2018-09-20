@@ -46,7 +46,10 @@ class associaGuiaCategoriaController {
         stripe_guias.data.map(guia => {
             this.findMysqlGuia(guia, async guia_cb => {
 
-                if(guia_cb.length > 0){
+                if(guia_cb.length == 0){
+                    await this.updateStrypeAssociacao(jwt.data.jwt,guia._id, {imported_category: true});
+                }
+                else if(guia_cb.length > 0){
 
                     try {
                         console.log("Guia::::: ", guia_cb);
@@ -54,13 +57,15 @@ class associaGuiaCategoriaController {
                         let categories = [] 
                         await Promise.all(guia_cb.map(async news => {
                             let cat =  await this.getCategoryByWpid(jwt.data.jwt, news.term_id)
-                            //console.log("categoria: ", cat);
+                            console.log("categoria: ", cat.data);
                             if(cat.data.length > 0)
                                 categories.push(cat.data[0]);
                         }))
 
-                        if(categories.length == 0 )
+                        if(categories.length == 0 ){
+                            await this.updateStrypeAssociacao(jwt.data.jwt, guia._id, {imported_category: true});
                             return;
+                        }
 
                         let obj = {
                             categorias: categories,
@@ -150,7 +155,7 @@ class associaGuiaCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/guia?_limit=100&imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/guia?imported_category=false&_start=150&_limit=100',  config);
             return ret;
         }
         catch(e){
@@ -165,7 +170,7 @@ class associaGuiaCategoriaController {
         let sql = ` select p.ID, p.post_title, t.term_id, t.name, t.slug, tt.taxonomy, tt.term_taxonomy_id
         FROM nkty_posts p
         inner join nkty_term_relationships tr on p.ID = tr.object_id
-        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'item_category'
+        inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and (tt.taxonomy = 'item_category' or tt.taxonomy = 'servico_category')
         inner join nkty_terms t on t.term_id = tt.term_id
         where t.name != 'Uncategorized' and tr.imported = 0
         and p.ID = ${guia.wpid}`
