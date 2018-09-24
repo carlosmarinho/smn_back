@@ -1,6 +1,7 @@
 const {ObjectId} = require('mongodb');
 const _ = require ('lodash/core');
-var slugify = require('slugify')
+const slugify = require('slugify');
+
 const MysqlJson = require('mysql-json');
 const mysql = require('mysql');
 
@@ -59,7 +60,7 @@ class PaginaController {
                         console.log("ERRO: pagina: ", pagina.post_title, " não foi incluido!");
                 }
                 else
-                        console.log("Categoria ", pagina.post_title, " já foi incluida!");
+                        console.log("Pagina ", pagina.post_title, " já foi incluida!");
 
             }) 
             
@@ -98,11 +99,48 @@ class PaginaController {
             
         //console.log('cidade: ', cidade);
         //console.log('bairro: ', bairro);
+        let descricao = '';
+        if(pagina.post_content.includes('images=\"') || pagina.post_content.includes('[gallery size')){
+            console.log("desciricao::::: ", pagina.post_content);
+            let ids1 = [];
+            if(pagina.post_content.includes('images=\"'))
+                ids1 = pagina.post_content.split('images=\"')[1].split('" onclick')[0];
+            else
+                ids1 = pagina.post_content.split(' ids="')[1].split('" orderby')[0];
+            console.log("ids: ", ids1, "\n\n\n");
 
+            this.findMysqlImage(ids1, (guids) => {
+                
+                let ar_guid = guids.map(id => {
+                    return id['guid']    
+                })
+                //console.log("\n\n\nOs guids: ", ar_guid.join(','));
+
+                //console.log("\n\n\nOs guids replaceddddd: ", pagina.post_content.replace(ids1, ar_guid.join(',')));
+
+                descricao = this.processDescricao(pagina.post_content.replace(ids1, ar_guid.join(',')), pagina.post_title, ar_guid.join(','));
+                return this.gravaPostPagina(pagina, cidade, bairro, descricao, jwt);
+                //console.log("\n\n\nMinha desc: ", descricao)
+            }) 
+
+
+
+
+        }
+        else {
+            descricao = this.processDescricao(pagina.post_content)
+            return this.gravaPostPagina(pagina, cidade, bairro, descricao, jwt)
+            
+        }
+    }
+
+    async gravaPostPagina(pagina, cidade, bairro, descricao, jwt){
+        
+    
         let obj = {
                 wpid: pagina.ID,
                 nome: pagina.post_title,
-                descricao: this.processDescricao(pagina.post_content),
+                descricao: descricao,
                 slug: pagina.slug,
                 cidade: cidade,
                 bairro: bairro,
@@ -115,45 +153,74 @@ class PaginaController {
         return ret;
     }
 
-    processDescricao(descricao){
+    generateImageGalleryHeader(title){
+        return `
+    <div className="pglist-p3 pglist-bg pglist-p-com" id="ld-gal">
+        <div className="pglist-p-com-ti">
+            <h3>${title}</h3> </div>
+        <div className="list-pg-inn-sp">
+            <div id="myCarousel" className="carousel slide" data-ride="carousel">`;
+    }
+
+    generateImageGalleryFooter(){
+        return `
+                <a className="left carousel-control" href="#myCarousel" data-slide="prev"> <i className="fa fa-angle-left list-slider-nav" aria-hidden="true"></i> </a>
+                <a className="right carousel-control" href="#myCarousel" data-slide="next"> <i className="fa fa-angle-right list-slider-nav list-slider-nav-rp" aria-hidden="true"></i> </a>
+            </div>
+        </div>
+    </div>
+`;
+    }
+                                    
+    
+    processDescricao(descricao, title = null, replacement = null){
 
         descricao = descricao.replace('id=\"HOTWordsTxt\"', '');
 
-        let generatedImages = '<ul>';
-        if(descricao.includes('images=\"')){
-            
+        let generatedImages = '\r\n\t\t\t<ol className="carousel-indicators">\r\n';
+        let generatedImages1 = '\r\n\t\t\t<div className="carousel-inner">\r\n';
+        if(descricao.includes('images="')){
+            console.log('\n\ndescricao: ', descricao);
             let newDesc = descricao.split('images=\"');
-            newDesc = newDesc[1].split(',')
+            newDesc = newDesc[1].split('" onclick')[0].split(',')
+            //console.log("\n\n\nmeu desc: ", newDesc);
+            let i = 0;
             newDesc.map(img => {
-                generatedImages = generatedImages + `<li><img src="${img}"></li>`
+               
+                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" className="${i++==0?'active':''}"></li>\r\n`
+                generatedImages1 = generatedImages1 + `\t\t\t\t<div className="item active"><img src="${img}" /></div>\r\n`
             })
-            generatedImages += '</ul>';
-            if(descricao.includes('images=\"151796,148074,143821,143819,143818,143817,143796,143816,143742,143741,146629,124579,157474\"'))
-                descricao = descricao.replace('images=\"151796,148074,143821,143819,143818,143817,143796,143816,143742,143741,146629,124579,157474\"',generatedImages);
-            else if(descricao.includes('asdfsdgfdg')){
-                descricao = descricao.replace('asdfsdfsd', generatedImages);
-            }
+            generatedImages += '\t\t\t</ol>\r\n';
+            generatedImages1 += '\t\t\t</div>\r\n';
+
+            generatedImages = this.generateImageGalleryHeader(title) + generatedImages + generatedImages1 + this.generateImageGalleryFooter();
+
+            descricao = descricao.replace(replacement, generatedImages);
+
         }
         else if(descricao.includes('[gallery size=\"medium\" ids=\"')){
             
             let newDesc = descricao.split('[gallery size=\"medium\" ids=\"');
-            newDesc = newDesc[1].split(',')
+            newDesc = newDesc[1].split('" orderby')[0].split(',')
+            //console.log('\n\n\n-----------new desc: ', newDesc);
+            let i = 0;
             newDesc.map(img => {
-                generatedImages = generatedImages + `<li><img src="${img}"></li>`
+
+                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" className="${i++==0?'active':''}"></li>\r\n`
+                generatedImages1 = generatedImages1 + `\t\t\t\t<div className="item active"><img src="${img}" /></div>\r\n`
             })
-            generatedImages += '</ul>';
-            
-            if(descricao.includes('[gallery size=\"medium\" ids=\"143739,143740,143741,143742,143743,143744,143745\"'))
-                descricao = descricao.replace('[gallery size=\"medium\" ids=\"143739,143740,143741,143742,143743,143744,143745\"',generatedImages);
-            else if(descricao.includes('[gallery size=\"medium\" ids=\"143299,143300,143301,143302,143303\"'))
-                descricao = descricao.replace('[gallery size=\"medium\" ids=\"143299,143300,143301,143302,143303\"',generatedImages);
-            else if('[gallery size=\"medium\" ids=\"143793,143795,143794,143796\"')
-                descricao = descricao.replace('[gallery size=\"medium\" ids=\"143793,143795,143794,143796\"',generatedImages);
-            else if('[gallery size=\"medium\" ids=\"143821,143817,143819,143816,143818,143820\"')
-                descricao = descricao.replace('[gallery size=\"medium\" ids=\"143821,143817,143819,143816,143818,143820\"',generatedImages);
-            else if('[gallery size=\"medium\" ids=\"143842,143843,143844,143839,143840,148581\"')
-                descricao = descricao.replace('[gallery size=\"medium\" ids=\"143842,143843,143844,143839,143840,148581\"',generatedImages);
+            generatedImages += '\t\t\t</ol>\r\n';
+            generatedImages1 += '\t\t\t</div>\r\n';
+
+            generatedImages = this.generateImageGalleryHeader(title) + generatedImages + generatedImages1 + this.generateImageGalleryFooter();
+
+            descricao = descricao.replace(replacement, generatedImages);
+
         }         
+
+        //console.log('A descricao aqui: ', descricao);
+
+        descricao = descricao.replace('" orderby=\"rand\"]\r\n', '');
 
         descricao = descricao.replace('orderby=\"rand\"]\r\n', '');
 
@@ -175,7 +242,6 @@ class PaginaController {
     //    let paginas = await this.getPaginas(jwt)
 
         //console.log("meus paginas: ", paginas);
-
         return paginas.filter(pagina => {
             //console.log("\n ------------------------->>>>>>", pagina.wpid , " --- ", ID)
             if(pagina.wpid == ID)
@@ -224,6 +290,26 @@ class PaginaController {
         }
     }
 
+    findMysqlImage(ids, cb){
+
+
+        let sql = `SELECT guid
+        FROM nkty_posts 
+        WHERE  ID IN (${ids}) `;
+
+        console.log("\n\n", sql, "\n\n\n")
+        let pagina = mysqlJson.query( sql, (error, posts) => {
+            //console.log("aasdfsd: ", paginas)
+            if(!error){
+                //console.log(posts);
+                cb(posts);
+            }
+            else{
+                console.log("erro: ", error);
+            }
+        })
+        
+    }
 
     findMysqlPaginas(cb){
 
@@ -236,7 +322,7 @@ class PaginaController {
         post_title like 'historia do bairro%' or post_title = 'História da Cidade de Niterói - RJ' or
         post_title like 'população do bairro%' or post_title = 'População da Cidade de Niterói' or
         post_title like 'turismo na Cidade%' or post_title = 'Fotos da cidade de Niterói' 
-        ) and ID != 137637 and ID != 137650 and ID != 137654 `;
+        )  and ID != 137637 and ID != 137650 and ID != 137654 `;
 
         console.log("\n\n", sql, "\n\n\n")
         let pagina = mysqlJson.query( sql, (error, paginas) => {
