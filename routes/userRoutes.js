@@ -27,6 +27,9 @@ const controller_evento_bairro = require('../controllers/associaEventoBairroCont
 const controller_guia = require('../controllers/guiaController')
 const controller_guia_categoria = require('../controllers/associaGuiaCategoriaController')
 const controller_guia_image = require('../controllers/guiaImagemDestacadaController')
+const controller_guia_bairro = require('../controllers/associaGuiaBairroController')
+
+const controller_pagina = require('../controllers/paginaController')
 
 const controller_servico = require('../controllers/servicoController')
 
@@ -71,8 +74,13 @@ module.exports = (app, upload) => {
     //Importação dos guias
     app.get("/guia/migrate", (req, res) => controller_guia.migrate(req, res) )
     app.get("/associa_guia_categoria/migrate", (req, res) => controller_guia_categoria.migrate(req, res) )
+    app.get("/associa_guia_bairro/migrate", (req, res) => controller_guia_bairro.migrate(req, res) )
     app.get("/guia_img_destacada/migrate", (req, res) => controller_guia_image.migrate(req, res) )
 
     //Importação dos serviços lembrando que serviço agora é guia
     app.get("/servico/migrate", (req, res) => controller_servico.migrate(req, res) )
+
+    //Importação das páginas
+    app.get("/pagina/migrate", (req, res) => controller_pagina.migrate(req, res) )
+
 }
