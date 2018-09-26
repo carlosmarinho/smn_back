@@ -27,7 +27,7 @@ class CategoriaServicoController {
     }
 
     async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: '3ngenhoc2' })
+        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
         
         return ret;
     }
