@@ -6,6 +6,9 @@ const controller_catservico = require('../controllers/categoriaServicoController
 const controller_catguia_image = require('../controllers/categoriaImageGuiaController')
 const controller_catevento_image = require('../controllers/categoriaImageEventoController')
 
+const controller_cat_to_cat = require('../controllers/associaCategoriaToCategoriaParentController')
+
+
 const controller_tag = require('../controllers/tagController')
 
 const controller_bairro = require('../controllers/bairroController')
@@ -42,6 +45,10 @@ module.exports = (app, upload) => {
     app.get("/catguia/migrate", (req, res) => controller_catguia.migrate(req, res) )
     app.get("/catservico/migrate", (req, res) => controller_catservico.migrate(req, res) )
     app.get("/catevento/migrate", (req, res) => controller_catevento.migrate(req, res) )
+
+    app.get("/associa_categoria_categoria_parent/migrate", (req, res) => controller_cat_to_cat.migrate(req, res) )
+
+
 
     //Importação de imagem das categorias
     app.get("/catguiaimage/migrate", (req, res) => controller_catguia_image.migrate(req, res) )

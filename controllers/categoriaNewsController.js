@@ -73,15 +73,15 @@ class CategoriaNewsController {
     async insertCategory(jwt, category){
         
         let obj = {
-                wpid: category.term_id,
-                nome: category.name,
-                slug: "noticia/" + slugify(category.name, {remove: /[*+~.()'"!:@]/g, lower: true}),
-                slug_wp: category.slug,
-                descricao: category.description,
-                count: category.count,
-                tipo: 'notícia',
-                parent: category.parent
-            }    
+            wpid: category.term_id,
+            nome: category.name,
+            slug: "noticia/" + slugify(category.name, {remove: /[*+~.()'"!:@]/g, lower: true}),
+            slug_wp: category.slug,
+            descricao: category.description,
+            count: category.count,
+            tipo: 'notícia',
+            wp_parent_id: category.parent,
+        }    
 
         console.log("obj: ", obj)
         let ret = await this.insertStrypeCategory(jwt, obj);
@@ -130,8 +130,8 @@ class CategoriaNewsController {
 
     findMysqlCategorys(cb){
         let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.parent, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' AND tt.imported = 0 " +
-        " WHERE t.term_id > 37 and t.term_id < 81 or t.term_id in (16,17)" 
+        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' AND tt.imported = 1 " +
+        " WHERE t.term_id > 37 and t.term_id < 81 or t.term_id in (3,16,17)" 
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {
