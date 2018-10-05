@@ -40,17 +40,22 @@ class associaCategoriaToCategoriaParentController {
 
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
-        let stripe_categorias = await this.getCategorias(jwt.data.jwt)
+        let stripe_categorias = await this.getCategoriasToUpdate(jwt.data.jwt)
         //console.log('stripe_categorias: ', stripe_categorias.data);
 
          stripe_categorias.data.map( async categoria => {
-            if(categoria.wp_parent_id)
+            if(categoria.wp_parent_id && categoria.wp_parent_id != 0)
             {
-                let cat = this.getCategoriaByParentWpId(stripe_categorias.data, categoria.wp_parent_id)
-                
-                let new_cat = {parent_id: cat[0]._id}
-                if(cat[0])
+                console.log("vai achar o parent: ", categoria.nome + " --- " + categoria.wp_parent_id)
+                let stripe_categorias1 = await this.getCategorias(jwt.data.jwt)
+
+                let cat = this.getCategoriaByParentWpId(stripe_categorias1.data, categoria.wp_parent_id)
+                console.log("cat[0]: ", cat[0]);
+                if(cat[0]){
+                    let new_cat = {parent_id: cat[0]._id}
+                    console.log("\n\n Categoria ", cat[0].nome, " ------> categoria pai: ", categoria.nome , "\n");
                     await this.updateStrypeCategory(jwt.data.jwt, categoria._id, new_cat)
+                }
             }
 
         }) 
@@ -115,13 +120,27 @@ class associaCategoriaToCategoriaParentController {
         }
     }
 
+    async getCategoriasToUpdate(jwt){
+        let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
+        
+        //console.log("\n\nconfig: ", config);
+        try{
+            //let ret = await axios.get('http://localhost:1337/categoria?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/categoria?parent_id=&_limit=500',  config);
+            return ret;
+        }
+        catch(e){
+            console.log("\n\n\n error: ", e);
+        }
+    }
+
     async getCategorias(jwt){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/categoria?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/categoria',  config);
+            let ret = await axios.get('http://localhost:1337/categoria?_limit=500',  config);
             return ret;
         }
         catch(e){
