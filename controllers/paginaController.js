@@ -155,17 +155,17 @@ class PaginaController {
 
     generateImageGalleryHeader(title){
         return `
-    <div className="pglist-p3 pglist-bg pglist-p-com" id="ld-gal">
-        <div className="pglist-p-com-ti">
+    <div class="pglist-p3 pglist-bg pglist-p-com" id="ld-gal">
+        <div class="pglist-p-com-ti">
             <h3>${title}</h3> </div>
-        <div className="list-pg-inn-sp">
-            <div id="myCarousel" className="carousel slide" data-ride="carousel">`;
+        <div class="list-pg-inn-sp">
+            <div id="myCarousel" class="carousel slide" data-ride="carousel">`;
     }
 
     generateImageGalleryFooter(){
         return `
-                <a className="left carousel-control" href="#myCarousel" data-slide="prev"> <i className="fa fa-angle-left list-slider-nav" aria-hidden="true"></i> </a>
-                <a className="right carousel-control" href="#myCarousel" data-slide="next"> <i className="fa fa-angle-right list-slider-nav list-slider-nav-rp" aria-hidden="true"></i> </a>
+                <a class="left carousel-control" href="#myCarousel" data-slide="prev"> <i class="fa fa-angle-left list-slider-nav" aria-hidden="true"></i> </a>
+                <a class="right carousel-control" href="#myCarousel" data-slide="next"> <i class="fa fa-angle-right list-slider-nav list-slider-nav-rp" aria-hidden="true"></i> </a>
             </div>
         </div>
     </div>
@@ -177,8 +177,8 @@ class PaginaController {
 
         descricao = descricao.replace('id=\"HOTWordsTxt\"', '');
 
-        let generatedImages = '\r\n\t\t\t<ol className="carousel-indicators">\r\n';
-        let generatedImages1 = '\r\n\t\t\t<div className="carousel-inner">\r\n';
+        let generatedImages = '\r\n\t\t\t<ol class="carousel-indicators">\r\n';
+        let generatedImages1 = '\r\n\t\t\t<div class="carousel-inner">\r\n';
         if(descricao.includes('images="')){
             console.log('\n\ndescricao: ', descricao);
             let newDesc = descricao.split('images=\"');
@@ -187,8 +187,8 @@ class PaginaController {
             let i = 0;
             newDesc.map(img => {
                
-                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" className="${i++==0?'active':''}"></li>\r\n`
-                generatedImages1 = generatedImages1 + `\t\t\t\t<div className="item active"><img src="${img}" /></div>\r\n`
+                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" class="${i++==0?'active':''}"></li>\r\n`
+                generatedImages1 = generatedImages1 + `\t\t\t\t<div class="item active"><img src="${img}" /></div>\r\n`
             })
             generatedImages += '\t\t\t</ol>\r\n';
             generatedImages1 += '\t\t\t</div>\r\n';
@@ -206,8 +206,8 @@ class PaginaController {
             let i = 0;
             newDesc.map(img => {
 
-                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" className="${i++==0?'active':''}"></li>\r\n`
-                generatedImages1 = generatedImages1 + `\t\t\t\t<div className="item active"><img src="${img}" /></div>\r\n`
+                generatedImages = generatedImages + `\t\t\t\t<li data-target="#myCarousel" data-slide-to="${i}" class="${i++==0?'active':''}"></li>\r\n`
+                generatedImages1 = generatedImages1 + `\t\t\t\t<div class="item active"><img src="${img}" /></div>\r\n`
             })
             generatedImages += '\t\t\t</ol>\r\n';
             generatedImages1 += '\t\t\t</div>\r\n';
