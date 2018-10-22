@@ -50,7 +50,7 @@ class associaCategoriaToCategoriaParentController {
                 let stripe_categorias1 = await this.getCategorias(jwt.data.jwt)
 
                 let cat = this.getCategoriaByParentWpId(stripe_categorias1.data, categoria.wp_parent_id)
-                console.log("cat[0]: ", cat[0]);
+                
                 if(cat[0]){
                     let new_cat = {parent_id: cat[0]._id}
                     console.log("\n\n Categoria ", cat[0].nome, " ------> categoria pai: ", categoria.nome , "\n");
