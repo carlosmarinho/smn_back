@@ -162,7 +162,7 @@ class EventoController {
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'begin_hour' and post_id = p.ID) as hora_inicio, " +
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'end_hour' and post_id = p.ID) as hora_fim " +
         " FROM nkty_posts p " +
-        " WHERE p.imported = 1 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'jv_events' " +
+        " WHERE p.imported = 0 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'jv_events' " +
         " order by ID asc limit 300 ";
         //"  ) limit 100";
 

@@ -75,11 +75,11 @@ class CategoriaServicoController {
         let obj = {
                 wpid: category.term_id,
                 nome: category.name,
-                slug: "guia/" + category.slug,
+                slug: "guia/servico/" + category.slug,
                 slug_wp: category.slug,
                 descricao: category.description,
                 count: category.count,
-                tipo: 'guia',
+                tipo: 'guia serviço',
                 wp_parent_id: category.parent
         }    
 
