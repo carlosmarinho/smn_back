@@ -155,7 +155,7 @@ class associaNoticiaCategoriaController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=200',  config);
             return ret;
         }
         catch(e){

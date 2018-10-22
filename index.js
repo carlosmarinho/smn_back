@@ -16,6 +16,13 @@ app.use(cors({origin: 'http://localhost:3000'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(cookieSession({
+    name: 'session',
+    keys: ["key1"],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 
 /* app.post("/users", upload.single('files'), (req, res) => {

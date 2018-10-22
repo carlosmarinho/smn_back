@@ -30,15 +30,21 @@ class associaNoticiaTagController {
 
     }
 
-    async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+    async authenticate(req){
+
+        let ret
+        console.log("sessao: ", req.session.jwt)
+        if(!req.session.jwt){
+            ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+            req.session.jwt = ret;
+        }
         
-        return ret;
+        return req.session.jwt;
     }
 
     async migrate(req, res){
 
-        let jwt = await this.authenticate();
+        let jwt = await this.authenticate(req);
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
         console.log('stripe_noticias: ', stripe_noticias.data);
@@ -152,7 +158,7 @@ class associaNoticiaTagController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?imported_tag=false&_start=0&_limit=100',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_tag=false&_start=100&_limit=100',  config);
             return ret;
         }
         catch(e){
