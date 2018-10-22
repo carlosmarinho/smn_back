@@ -130,7 +130,7 @@ class CategoriaGuiaController {
 
     findMysqlCategorys(cb){
         let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.parent, tt.count FROM nkty_terms t " +
-        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.imported = 1 AND tt.taxonomy = 'item_category' "
+        " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.imported = 0 AND tt.taxonomy = 'item_category' "
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {

@@ -168,7 +168,7 @@ class ServicoController {
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'jv_servico_twitter' and post_id = p.ID order by post_id desc limit 1) as twitter, " +
         "(SELECT meta_value FROM nkty_postmeta WHERE meta_key = 'javo_this_exist_no_more_servico' and post_id = p.ID order by post_id desc limit 1) as nao_existe_mais " +
         " FROM nkty_posts p " +
-        " WHERE p.imported = 1 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'servico' " +
+        " WHERE p.imported = 0 and (p.post_status = 'publish' or p.post_status = 'published') and p.post_type = 'servico' " +
         " order by ID asc limit 300 ";
         //"  ) limit 100";
 
