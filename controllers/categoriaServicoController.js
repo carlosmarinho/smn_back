@@ -75,7 +75,7 @@ class CategoriaServicoController {
         let obj = {
                 wpid: category.term_id,
                 nome: category.name,
-                slug: "guia/servico/" + category.slug,
+                slug: "guia/servicos/" + category.slug,
                 slug_wp: category.slug,
                 descricao: category.description,
                 count: category.count,
