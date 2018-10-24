@@ -41,7 +41,7 @@ class associaNoticiaCategoriaController {
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
-        console.log('stripe_noticias: ', stripe_noticias.data);
+        console.log('stripe_noticias: ', stripe_noticias.data.length);
 
         stripe_noticias.data.map(noticia => {
             this.findMysqlNoticia(noticia, async noticia_cb => {
@@ -62,6 +62,7 @@ class associaNoticiaCategoriaController {
 
                         if(categories.length == 0 ){
                             await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_category: true});
+                            console.log("Nenhuma categoria vai retornar e não vai fazer nada \n\n\n")
                             return;
                         }
 
@@ -71,7 +72,7 @@ class associaNoticiaCategoriaController {
                             imported_category: true
                         }
 
-                        console.log("o objeto: ", obj);
+                        console.log("\n\n\n\n\no objeto: ", obj);
 
                         let assoc = await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, obj);
 
@@ -80,11 +81,11 @@ class associaNoticiaCategoriaController {
                         
                         conn.query(update, err => {
                             if(err)
-                                console.log('o post de id ', noticia_cb[0] , ' não foi marcado como importado \nErro:', err)
+                                console.log('o post de id ', noticia_cb[0] , ' não foi marcado como importado \nErro:', err.message)
                         });
 
                     } catch (e) {
-                    console.error("\n\n", e)
+                    console.error("\n\n", e.message)
                     }
 
                 }
@@ -117,7 +118,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error updateStrypeAssociaaco: ", e.message);
         } 
     }
 
@@ -131,7 +132,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error insertStrypeNoticia: ", e.message);
         } 
     }
 
@@ -145,7 +146,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error getCategoryByWpid: ", e.message);
         }
     }
 
@@ -155,11 +156,11 @@ class associaNoticiaCategoriaController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=200',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=10',  config);
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error getNoticias: ", e.message);
         }
     }
 
@@ -182,7 +183,7 @@ class associaNoticiaCategoriaController {
                 cb(noticia);
             }
             else{
-                console.log("erro: ", error);
+                console.log("error findmysqlnoticia: ", error.message);
             }
         })
         

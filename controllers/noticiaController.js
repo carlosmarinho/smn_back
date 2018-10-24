@@ -38,7 +38,7 @@ class NoticiaController {
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
         
-        //console.log("minhas noticias: ", stripe_noticias.data, "\n\n");
+        console.log("minhas noticias: ", stripe_noticias.data, "\n\n");
         
         this.findMysqlNoticias(noticias => {
             let ar_noticias = noticias.map(noticia => {
@@ -139,7 +139,7 @@ class NoticiaController {
         "           inner join nkty_term_taxonomy tt on tt.term_taxonomy_id = tr.term_taxonomy_id " +
         "           inner join nkty_terms t on t.term_id = tt.term_id " +
         "           where (tt.term_id > 37 and tt.term_id < 82) or tt.term_id in (16,17,18) or tt.description like 'Bairro%'" +
-        " ) order by ID limit 500 ";
+        " ) order by ID limit 3000 ";
         //"  ) limit 100";
 
         console.log("\n\n", sql, "\n\n\n")

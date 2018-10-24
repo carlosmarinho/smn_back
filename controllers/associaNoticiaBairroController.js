@@ -41,11 +41,11 @@ class associaNoticiaCategoriaController {
         let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
-        //console.log('stripe_noticias: ', stripe_noticias.data);
+        console.log('stripe_noticias: ', stripe_noticias.data.length);
 
         stripe_noticias.data.map(noticia => {
             this.findMysqlNoticia(noticia, async noticia_cb => {
-                console.log("vai ver a noticia de id", noticia_cb);
+                //console.log("vai ver a noticia de id", noticia_cb);
                 if(noticia_cb.length == 0){
                     await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_bairro: true});
                 }
@@ -58,7 +58,7 @@ class associaNoticiaCategoriaController {
                             await Promise.all(noticia_cb.map(async news => {
                                 let cat =  await this.getBairroByWpid(jwt.data.jwt, news.term_id)
                                 
-                                console.log('cat', cat);
+                                //console.log('cat', cat);
                                 if(cat.data.length > 0)
                                     bairros.push(cat.data[0]);
                             }))
@@ -84,7 +84,7 @@ class associaNoticiaCategoriaController {
                         
                         conn.query(update, err => {
                             if(err)
-                                console.log('o post de id ', noticia_cb[0] , ' não foi marcado como importado \nErro:', err)
+                                console.log('o post de id ', noticia_cb[0] , ' não foi marcado como importado \nErro:')
                         });
 
                     } catch (e) {
@@ -116,13 +116,14 @@ class associaNoticiaCategoriaController {
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
+        console.log("obj para atualizar o payload: ", obj);
         try{
             let ret = await axios.put(`http://localhost:1337/noticia/${noticia_id}`, obj, config);
             
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error updateStrypeAssociacao: ", e.message);
         } 
     }
 
@@ -138,7 +139,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error: getbairrowpid");
         }
     }
 
@@ -154,7 +155,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            //console.log("\n\n\n error getnoticias: " );
         }
     }
 
@@ -170,14 +171,14 @@ class associaNoticiaCategoriaController {
         where t.name != 'Uncategorized' and tr.imported = 0 and description like 'Bairro%'
         and p.ID = ${noticia.wpid}`
 
-        console.log("\n\n", sql, "\n\n\n")
+
         mysqlJson.query( sql, (error, noticia) => {
             
         if(!error){
                 cb(noticia);
             }
             else{
-                console.log("erro: ", error);
+                console.log("erro no findmysqlnoticia: ");
             }
         })
         

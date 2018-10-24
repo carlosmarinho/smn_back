@@ -151,7 +151,7 @@ class associaEventoCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/evento?imported_category=true&_start=100&_limit=200',  config);
+            let ret = await axios.get('http://localhost:1337/evento?imported_category=false&_start=0&_limit=100',  config);
             //let ret = await axios.get('http://localhost:1337/evento?_start=0&_limit=100',  config);
             return ret;
         }

@@ -42,8 +42,10 @@ class noticiaImagemDestacadaController {
             return false;
         }
 
-        await this.updateStrypeNoticia(jwt.data.jwt, noticia_id, {old_imagem_destacada: url});
+        await this.updateStrypeNoticia(jwt.data.jwt, noticia_id, {old_imagem_destacada: url, imported_imagem_destacada: true});
 
+        /* Não quero fazer downloads das imagens antigas */
+        return;
 
         const path_image = '/uploads/noticia/destacada/';
         let options = {
@@ -100,13 +102,15 @@ class noticiaImagemDestacadaController {
 
         let jwt = await this.authenticate();
         let stripe_noticias = await this.getNoticias(jwt.data.jwt)
-        console.log('stripe_noticias: ', stripe_noticias.data);
+        console.log('stripe_noticias: ', stripe_noticias.data.length);
         
 
         stripe_noticias.data.map(noticia => {
             
+            this.updateStrypeNoticia(jwt.data.jwt, noticia._id, {imported_imagem_destacada: true});
+
+
             this.findMysqlNoticia(noticia, async noticia_cb => {
-                console.log("O noticia: ", noticia.titulo, " dentro já do mysql \n")
                 if(noticia_cb.length > 0){
                         this.getMysqlPostMeta(noticia_cb[0].ID, async noticia_cb1 => {
                             let guid = '';
@@ -298,7 +302,7 @@ class noticiaImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?_limit=100&old_imagem_destacada=',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?_limit=100&imported_imagem_destacada=false&old_imagem_destacada=',  config);
             //let ret = await axios.get('http://localhost:1337/noticia?wpid=407',  config);
             return ret;
         }
@@ -340,10 +344,10 @@ class noticiaImagemDestacadaController {
                     cb(noticia1);
                 }
                 else{
-                    console.log("A Noticia é vazio");
+                    //console.log("A Noticia é vazio");
                     let sql = `SELECT p.* FROM nkty_posts p 
                     WHERE p.id = ( SELECT pt.meta_value FROM nkty_postmeta pt WHERE  pt.meta_key = '_thumbnail_id' and pt.post_id = ${noticia.wpid} ) `
-                    console.log("segunda query do mysql noticia: ", sql);
+                    //console.log("segunda query do mysql noticia: ", sql);
                     mysqlJson.query( sql, (error, noticia2) => {
                         if(!error){
                             cb(noticia2)
