@@ -51,14 +51,14 @@ class associaNoticiaCategoriaController {
                 else if(noticia_cb.length > 0){
 
                     try {
-                            console.log("Noticia::::: ", noticia_cb);
+                        console.log("Noticia::::: ", noticia_cb);
 
-                            let categories = [] 
-                            await Promise.all(noticia_cb.map(async news => {
-                                let cat =  await this.getCategoryByWpid(jwt.data.jwt, news.term_id)
-                                if(cat.data.length > 0)
-                                    categories.push(cat.data[0]);
-                            }))
+                        let categories = [] 
+                        await Promise.all(noticia_cb.map(async news => {
+                            let cat =  await this.getCategoryByWpid(jwt.data.jwt, news.term_id)
+                            if(cat.data.length > 0)
+                                categories.push(cat.data[0]);
+                        }))
 
                         if(categories.length == 0 ){
                             await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_category: true});
@@ -118,7 +118,7 @@ class associaNoticiaCategoriaController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error updateStrypeAssociaaco: ", e.message);
+            console.log("\n\n\n error updateStrypeAssociaaco: ", e.message, "\n\nobjeto q deu erro:", obj.categorias[0].noticias);
         } 
     }
 
@@ -141,7 +141,7 @@ class associaNoticiaCategoriaController {
         //console.log(`\n\nPegando a categoria: http://localhost:1337/categoria?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/categoria?wpid=${wpid}`,  config);
+            let ret = await axios.get(`http://localhost:1337/categoria?populateAssociation=false&wpid=${wpid}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -156,7 +156,7 @@ class associaNoticiaCategoriaController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_limit=10',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?populateAssociation=false&imported_category=false&_limit=500',  config);
             return ret;
         }
         catch(e){

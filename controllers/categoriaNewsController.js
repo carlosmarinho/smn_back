@@ -110,7 +110,7 @@ class CategoriaNewsController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error insertstrypecategory: ", e.message);
         } 
     }
 
@@ -123,7 +123,7 @@ class CategoriaNewsController {
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error getcategorys: ", e.message);
         }
     }
 
@@ -140,7 +140,7 @@ class CategoriaNewsController {
                 cb(categorys);
             }
             else{
-                console.log("erro: ", error);
+                console.log("erro findmysqlcategorys: ", error.message);
             }
         })
         
