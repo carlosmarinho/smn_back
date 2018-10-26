@@ -119,7 +119,7 @@ class CategoriaNewsController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/categoria/',  config);
+            let ret = await axios.get('http://localhost:1337/categoria/?populateAssociation=false',  config);
             return ret;
         }
         catch(e){
@@ -131,7 +131,7 @@ class CategoriaNewsController {
     findMysqlCategorys(cb){
         let sql = "SELECT tt.term_taxonomy_id, t.term_id, t.name, t.slug, tt.description, tt.parent, tt.count FROM nkty_terms t " +
         " INNER JOIN nkty_term_taxonomy tt ON t.term_id = tt.term_id AND tt.taxonomy = 'category' AND tt.imported = 0 " +
-        " WHERE t.term_id >= 37 and t.term_id < 81 or t.term_id in (3,16,17)" 
+        " WHERE t.term_id >= 37 and t.term_id < 83 or t.term_id in (3,16,17,252,253,254)" 
 
         console.log("\n\n", sql, "\n\n\n")
         let category = mysqlJson.query( sql, (error, categorys) => {

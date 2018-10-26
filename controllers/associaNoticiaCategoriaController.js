@@ -44,6 +44,8 @@ class associaNoticiaCategoriaController {
         console.log('stripe_noticias: ', stripe_noticias.data.length);
 
         stripe_noticias.data.map(noticia => {
+            console.log("\n\n\nNoticias ----------------->: ", noticia)
+            return;
             this.findMysqlNoticia(noticia, async noticia_cb => {
                 if(noticia_cb.length == 0){
                     await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, {imported_category: true});
@@ -156,7 +158,7 @@ class associaNoticiaCategoriaController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/noticia?populateAssociation=false&imported_category=false&_limit=500',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?populateAssociation=false&imported_category=false&_limit=280',  config);
             return ret;
         }
         catch(e){

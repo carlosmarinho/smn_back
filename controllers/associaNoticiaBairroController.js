@@ -44,6 +44,10 @@ class associaNoticiaCategoriaController {
         console.log('stripe_noticias: ', stripe_noticias.data.length);
 
         stripe_noticias.data.map(noticia => {
+            /* if(noticia.bairros.length > 0){
+                console.log("\n\n\nNoticias bairros length ----------------->: ", noticia.bairros.length)    
+                return;
+            } */
             this.findMysqlNoticia(noticia, async noticia_cb => {
                 //console.log("vai ver a noticia de id", noticia_cb);
                 if(noticia_cb.length == 0){
@@ -134,7 +138,7 @@ class associaNoticiaCategoriaController {
         //console.log(`\n\nPegando o bairro: http://localhost:1337/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/bairro?wpid=${wpid}`,  config);
+            let ret = await axios.get(`http://localhost:1337/bairro?populateAssociation=false&wpid=${wpid}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -149,7 +153,7 @@ class associaNoticiaCategoriaController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get('http://localhost:1337/noticia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/noticia?imported_bairro=false&_limit=500',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?populateAssociation=false&imported_bairro=false&_limit=300',  config);
             //let ret = await axios.get('http://localhost:1337/noticia?wpid=2465&_limit=100',  config);
 
             return ret;
@@ -178,7 +182,7 @@ class associaNoticiaCategoriaController {
                 cb(noticia);
             }
             else{
-                console.log("erro no findmysqlnoticia: ");
+                console.log("\n\n\n\n ------------------ erro no findmysqlnoticia: ", error.message, "---------------\n\n\n");
             }
         })
         
