@@ -321,7 +321,8 @@ class PaginaController {
         post_title like 'fotos do bairro%' or post_title = 'Fotos da cidade de Niterói' or 
         post_title like 'historia do bairro%' or post_title = 'História da Cidade de Niterói - RJ' or
         post_title like 'população do bairro%' or post_title = 'População da Cidade de Niterói' or
-        post_title like 'turismo na Cidade%' or post_title = 'Fotos da cidade de Niterói' 
+        post_title like 'turismo na Cidade%' or post_title = 'Fotos da cidade de Niterói' or
+        post_title like 'Ocupação do Bairro %' or post_title = 'Caracteristicas e tendências atuais no ' 
         )  and ID != 137637 and ID != 137650 and ID != 137654 `;
 
         console.log("\n\n", sql, "\n\n\n")
