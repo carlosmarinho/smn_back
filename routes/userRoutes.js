@@ -8,6 +8,8 @@ const controller_catevento_image = require('../controllers/categoriaImageEventoC
 
 const controller_cat_to_cat = require('../controllers/associaCategoriaToCategoriaParentController')
 
+const controller_cat_to_new = require('../controllers/associaCategoriaToNewController')
+
 
 const controller_tag = require('../controllers/tagController')
 
@@ -47,6 +49,7 @@ module.exports = (app, upload) => {
     app.get("/catevento/migrate", (req, res) => controller_catevento.migrate(req, res) )
 
     app.get("/associa_categoria_categoria_parent/migrate", (req, res) => controller_cat_to_cat.migrate(req, res) )
+    app.get("/associa_categoria_to_new/migrate", (req, res) => controller_cat_to_new.migrate(req, res) )
 
 
 
