@@ -261,7 +261,7 @@ class eventoImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/evento?old_imagem_destacada=',  config);
+            let ret = await axios.get('http://localhost:1337/evento?populateAssociation=false&_start=100&_limit=100&old_imagem_destacada=',  config);
             //let ret = await axios.get('http://localhost:1337/evento?wpid=152634',  config);
             return ret;
         }

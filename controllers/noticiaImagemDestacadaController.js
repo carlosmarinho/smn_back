@@ -45,6 +45,9 @@ class noticiaImagemDestacadaController {
         await this.updateStrypeNoticia(jwt.data.jwt, noticia_id, {old_imagem_destacada: url, imported_imagem_destacada: true});
 
         /* Não quero fazer downloads das imagens antigas */
+        if(url.includes('amazonaws')){
+            //console.log("não vai importar a imagem da amazon: ", url);
+        }
         return;
 
         const path_image = '/uploads/noticia/destacada/';
@@ -113,6 +116,7 @@ class noticiaImagemDestacadaController {
             this.findMysqlNoticia(noticia, async noticia_cb => {
                 if(noticia_cb.length > 0){
                         this.getMysqlPostMeta(noticia_cb[0].ID, async noticia_cb1 => {
+                            
                             let guid = '';
                             if(noticia_cb1.length > 0){
                                 let s3 = false;
@@ -302,7 +306,7 @@ class noticiaImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/noticia?_limit=100&imported_imagem_destacada=false&old_imagem_destacada=',  config);
+            let ret = await axios.get('http://localhost:1337/noticia?populateAssociation=false&_sort=-_id&_limit=140&imported_imagem_destacada=false&old_imagem_destacada=',  config);
             //let ret = await axios.get('http://localhost:1337/noticia?wpid=407',  config);
             return ret;
         }

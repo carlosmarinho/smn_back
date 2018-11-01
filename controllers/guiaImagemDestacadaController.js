@@ -229,7 +229,7 @@ class guiaImagemDestacadaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/guia?_start=1&_limit=200&old_imagem_destacada=',  config);
+            let ret = await axios.get('http://localhost:1337/guia?populateAssociation=false&_start=100&_limit=200&old_imagem_destacada=',  config);
             //let ret = await axios.get('http://localhost:1337/guia?wpid=152634',  config);
             return ret;
         }
@@ -261,7 +261,7 @@ class guiaImagemDestacadaController {
         //console.log("\n\n\n Guia: ", guia);
         let sql = ` SELECT p.* FROM nkty_posts p 
         INNER JOIN nkty_postmeta pt on pt.meta_value = p.ID
-        WHERE imported = 0 and p.post_type = 'attachment' and p.post_parent = ${guia.wpid} `
+        WHERE  p.post_type = 'attachment' and p.post_parent = ${guia.wpid} `
 
         console.log("\n\n", sql, "\n\n\n")
         mysqlJson.query( sql, (error, guia1) => {
