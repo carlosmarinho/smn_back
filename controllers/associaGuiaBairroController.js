@@ -7,6 +7,8 @@ const imageInfo = require('image-info');
 const path = require("path");
 const uuid = require('uuid/v4');
 const mysql = require('mysql');
+const keys = require("../config/keys");
+
 
 const mysql_con = {
     host:'127.0.0.1',
@@ -31,7 +33,7 @@ class associaGuiaBairroController {
     }
 
     async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+        let ret = await axios.post(`${keys.URL_API}/auth/local`, { identifier: 'adm_manager', password: keys.PASSWORD_API })
         
         return ret;
     }
@@ -117,7 +119,7 @@ class associaGuiaBairroController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.put(`http://localhost:1337/guia/${guia_id}`, obj, config);
+            let ret = await axios.put(`${keys.URL_API}/guia/${guia_id}`, obj, config);
             
             return ret;
         }
@@ -130,10 +132,10 @@ class associaGuiaBairroController {
 
     async getBairroBySlug(jwt, slug){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        //console.log(`\n\nPegando o bairro: http://localhost:1337/bairro?wpid=${wpid}`);
+        //console.log(`\n\nPegando o bairro: ${keys.URL_API}/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/bairro?slug=${slug}`,  config);
+            let ret = await axios.get(`${keys.URL_API}/bairro?slug=${slug}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -147,9 +149,9 @@ class associaGuiaBairroController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            //let ret = await axios.get('http://localhost:1337/guia?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/guia?imported_bairro=false&_limit=500',  config);
-            //let ret = await axios.get('http://localhost:1337/guia?wpid=2465&_limit=100',  config);
+            //let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=100`,  config);
+            let ret = await axios.get(`${keys.URL_API}/guia?imported_bairro=false&_limit=500`,  config);
+            //let ret = await axios.get(`${keys.URL_API}/guia?wpid=2465&_limit=100`,  config);
 
             return ret;
         }

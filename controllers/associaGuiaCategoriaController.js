@@ -7,6 +7,8 @@ const imageInfo = require('image-info');
 const path = require("path");
 const uuid = require('uuid/v4');
 const mysql = require('mysql');
+const keys = require("../config/keys");
+
 
 const mysql_con = {
     host:'127.0.0.1',
@@ -31,7 +33,7 @@ class associaGuiaCategoriaController {
     }
 
     async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+        let ret = await axios.post(`${keys.URL_API}/auth/local`, { identifier: 'adm_manager', password: keys.PASSWORD_API })
         
         return ret;
     }
@@ -127,7 +129,7 @@ class associaGuiaCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.post('http://localhost:1337/guia', guia, config);
+            let ret = await axios.post(`${keys.URL_API}/guia`, guia, config);
             //console.log(ret);
             return ret;
         }
@@ -155,7 +157,7 @@ class associaGuiaCategoriaController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/guia?imported_category=false&_start=0&_limit=150',  config);
+            let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=150`,  config);
             return ret;
         }
         catch(e){
