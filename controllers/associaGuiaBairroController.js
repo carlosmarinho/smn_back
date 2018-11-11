@@ -135,7 +135,7 @@ class associaGuiaBairroController {
         //console.log(`\n\nPegando o bairro: ${keys.URL_API}/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`${keys.URL_API}/bairro?slug=${slug}`,  config);
+            let ret = await axios.get(`${keys.URL_API}/bairro?populateAssociation=false&slug=${slug}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
@@ -150,7 +150,7 @@ class associaGuiaBairroController {
         //console.log("\n\nconfig: ", config);
         try{
             //let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=100`,  config);
-            let ret = await axios.get(`${keys.URL_API}/guia?imported_bairro=false&_limit=500`,  config);
+            let ret = await axios.get(`${keys.URL_API}/guia?populateAssociation=false&imported_bairro=true&_start=200_limit=300`,  config);
             //let ret = await axios.get(`${keys.URL_API}/guia?wpid=2465&_limit=100`,  config);
 
             return ret;
@@ -169,7 +169,7 @@ class associaGuiaBairroController {
         inner join nkty_term_relationships tr on p.ID = tr.object_id
         inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'item_location'
         inner join nkty_terms t on t.term_id = tt.term_id
-        where t.name != 'Uncategorized' and tr.imported = 0 
+        where t.name != 'Uncategorized' 
         and p.ID = ${guia.wpid}`
 
         console.log("\n\n", sql, "\n\n\n")
