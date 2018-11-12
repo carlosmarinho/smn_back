@@ -7,6 +7,8 @@ const imageInfo = require('image-info');
 const path = require("path");
 const uuid = require('uuid/v4');
 const mysql = require('mysql');
+const keys = require("../config/keys");
+
 
 const mysql_con = {
     host:'127.0.0.1',
@@ -31,7 +33,7 @@ class associaEventoBairroController {
     }
 
     async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+        let ret = await axios.post(`${keys.URL_API}/auth/local`, { identifier: 'adm_manager', password: keys.PASSWORD_API })
         
         return ret;
     }
@@ -58,7 +60,7 @@ class associaEventoBairroController {
                             await Promise.all(evento_cb.map(async news => {
                                 let cat =  await this.getBairroBySlug(jwt.data.jwt, news.slug)
                                 
-                                console.log('cat', cat);
+                                //console.log('cat', cat);
                                 if(cat.data.length > 0)
                                     bairros.push(cat.data[0]);
                             }))
@@ -117,7 +119,7 @@ class associaEventoBairroController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.put(`http://localhost:1337/evento/${evento_id}`, obj, config);
+            let ret = await axios.put(`${keys.URL_API}/evento/${evento_id}`, obj, config);
             
             return ret;
         }
@@ -130,15 +132,15 @@ class associaEventoBairroController {
 
     async getBairroBySlug(jwt, slug){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
-        //console.log(`\n\nPegando o bairro: http://localhost:1337/bairro?wpid=${wpid}`);
+        //console.log(`\n\nPegando o bairro: ${keys.URL_API}/bairro?wpid=${wpid}`);
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get(`http://localhost:1337/bairro?slug=${slug}`,  config);
+            let ret = await axios.get(`${keys.URL_API}/bairro?populateAssociation=false&slug=${slug}`,  config);
             //console.log("\n\nretorno: ", ret);
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error: ", e);
+            console.log("\n\n\n error: ", e.message);
         }
     }
 
@@ -147,9 +149,9 @@ class associaEventoBairroController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            //let ret = await axios.get('http://localhost:1337/evento?imported_category=false&_start=0&_limit=100',  config);
-            let ret = await axios.get('http://localhost:1337/evento?imported_bairro=false&_limit=500',  config);
-            //let ret = await axios.get('http://localhost:1337/evento?wpid=2465&_limit=100',  config);
+            //let ret = await axios.get(`${keys.URL_API}/evento?imported_category=false&_start=0&_limit=100',  config);
+            let ret = await axios.get(`${keys.URL_API}/evento?populateAssociation=false&imported_bairro=false&_start=150&_limit=250`,  config);
+            //let ret = await axios.get(`${keys.URL_API}/evento?wpid=2465&_limit=100`,  config);
 
             return ret;
         }
@@ -167,7 +169,7 @@ class associaEventoBairroController {
         inner join nkty_term_relationships tr on p.ID = tr.object_id
         inner join nkty_term_taxonomy tt on tr.term_taxonomy_id = tt.term_taxonomy_id and tt.taxonomy = 'item_location'
         inner join nkty_terms t on t.term_id = tt.term_id
-        where t.name != 'Uncategorized' and tr.imported = 0 
+        where t.name != 'Uncategorized'
         and p.ID = ${evento.wpid}`
 
         console.log("\n\n", sql, "\n\n\n")
@@ -177,7 +179,7 @@ class associaEventoBairroController {
                 cb(evento);
             }
             else{
-                console.log("erro: ", error);
+                console.log("erro: ", error.message);
             }
         })
         

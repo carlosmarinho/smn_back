@@ -1,6 +1,7 @@
 const {ObjectId} = require('mongodb');
 const _ = require ('lodash/core');
 const MysqlJson = require('mysql-json');
+const keys = require("../config/keys");
 const mysqlJson = new MysqlJson({
   host:'127.0.0.1',
   user:'root',
@@ -20,7 +21,7 @@ class UserController {
     }
 
     async authenticate(){
-        let ret = await axios.post('http://localhost:1337/auth/local', { identifier: 'adm_manager', password: 'carlos' })
+        let ret = await axios.post(`${keys.URL_API}/auth/local`, { identifier: 'adm_manager', password: keys.PASSWORD_API })
         
         return ret;
     }
@@ -99,7 +100,7 @@ class UserController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.post('http://localhost:1337/user/', user, config);
+            let ret = await axios.post(`${keys.URL_API}/user/`, user, config);
             //console.log(ret);
             return ret;
         }
@@ -113,7 +114,7 @@ class UserController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.get('http://localhost:1337/user/',  config);
+            let ret = await axios.get(`${keys.URL_API}/user/`,  config);
             return ret;
         }
         catch(e){
@@ -128,7 +129,7 @@ class UserController {
         " ( SELECT um.meta_value FROM nkty_usermeta um WHERE um.user_id = u.ID AND um.meta_key = 'first_name' ) as first_name, " +
         " ( SELECT um.meta_value FROM nkty_usermeta um WHERE um.user_id = u.ID AND um.meta_key = 'last_name' ) as last_name, " +
         " ( SELECT um.meta_value FROM nkty_usermeta um WHERE um.user_id = u.ID AND um.meta_key = 'description' ) as description " +
-        " FROM nkty_users u ";
+        " FROM nkty_users u limit 1100,100";
 
         console.log("\n\n", sql, "\n\n\n")
         let user = mysqlJson.query( sql, (error, users) => {
