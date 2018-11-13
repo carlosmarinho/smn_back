@@ -38,6 +38,9 @@ const controller_pagina = require('../controllers/paginaController')
 
 const controller_servico = require('../controllers/servicoController')
 
+
+const controller_noticia_object = require('../controllers/noticiaObjectToArrayController')
+
 module.exports = (app, upload) => {
   
     //Importação de categorias
@@ -73,6 +76,7 @@ module.exports = (app, upload) => {
     app.get("/associa_noticia_tag/migrate", (req, res) => controller_noticia_tag.migrate(req, res) )
     app.get("/associa_noticia_bairro/migrate", (req, res) => controller_noticia_bairro.migrate(req, res) )
     app.get("/noticia_img_destacada/migrate", (req, res) => controller_noticia_image.migrate(req, res) )
+    app.get("/noticia_object/migrate", (req, res) => controller_noticia_object.migrate(req, res) )
 
     //IMportação dos eventos
     app.get("/evento/migrate", (req, res) => controller_evento.migrate(req, res) )
