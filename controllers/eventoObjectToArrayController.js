@@ -174,7 +174,7 @@ class eventoObjectToArrayController {
         
         //console.log("\n\nconfig: ", config);
         try{
-	    let str_con = `${keys.URL_API}/evento?populateAssociation=true&_start=${start}&_limit=10`;
+	    let str_con = `${keys.URL_API}/evento?populateAssociation=true&_start=${start}&_limit=100`;
 	    console.log("string conexao: ", str_con);
             //let ret = await axios.get(`${keys.URL_API}/evento?imported_category=false&_start=0&_limit=100`,  config);
             let ret = await axios.get(str_con,  config);
