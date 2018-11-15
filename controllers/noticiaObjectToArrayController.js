@@ -39,14 +39,22 @@ class noticiaObjectToArrayController {
     }
 
     async migrate(req, res){
-
-        let jwt = await this.authenticate();
+	
+	console.log("params: ", req.params, " --- ", req.query)
+        
+	let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
-        let stripe_noticias = await this.getNoticias(jwt.data.jwt)
+        let stripe_noticias = await this.getNoticias(jwt.data.jwt, req.query.start)
         console.log('stripe_noticias: ', stripe_noticias.data.length);
 
-        stripe_noticias.data.map(noticia => {
-            //console.log("\n\n\nNoticias ----------------->: ", noticia)
+        await stripe_noticias.data.map(async noticia =>  {
+	    
+	    console.log("tamanho: ", noticia.array_categorias.length);
+   	    if(noticia.array_categorias.length>0)
+	    	return;
+
+            console.log("\n\n\n\nNoticias ----------------->: ", noticia.titulo, " --- wpid: ", noticia.wpid)
+
             let categorias = noticia.categorias.map(categoria => {
                 if(! categoria)
                     return null;
@@ -85,14 +93,16 @@ class noticiaObjectToArrayController {
 
                 return obj;
             })
-
-            
+ 
 
             let obj = {array_categorias: categorias, array_bairros: bairros, array_tags: tags}
 
-            this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, obj)
+
+            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, obj);
+
             
         }) 
+	console.log("finalizou de inserir o await");
 
         res.json("Importação finalizada com sucesso");
         
@@ -152,13 +162,15 @@ class noticiaObjectToArrayController {
         }
     }
 
-    async getNoticias(jwt){
+    async getNoticias(jwt, start){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
+	    let str_con = `${keys.URL_API}/noticia?populateAssociation=true&_start=${start}&_limit=10000`;
+	    console.log("string conexao: ", str_con);
             //let ret = await axios.get(`${keys.URL_API}/noticia?imported_category=false&_start=0&_limit=100`,  config);
-            let ret = await axios.get(`${keys.URL_API}/noticia?populateAssociation=true&_start=0&_limit=10`,  config);
+            let ret = await axios.get(str_con,  config);
             return ret;
         }
         catch(e){
