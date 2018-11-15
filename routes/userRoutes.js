@@ -40,6 +40,8 @@ const controller_servico = require('../controllers/servicoController')
 
 
 const controller_noticia_object = require('../controllers/noticiaObjectToArrayController')
+const controller_guia_object = require('../controllers/guiaObjectToArrayController')
+
 
 module.exports = (app, upload) => {
   
@@ -90,6 +92,8 @@ module.exports = (app, upload) => {
     app.get("/associa_guia_categoria/migrate", (req, res) => controller_guia_categoria.migrate(req, res) )
     app.get("/associa_guia_bairro/migrate", (req, res) => controller_guia_bairro.migrate(req, res) )
     app.get("/guia_img_destacada/migrate", (req, res) => controller_guia_image.migrate(req, res) )
+    app.get("/guia_object/migrate", (req, res) => controller_guia_object.migrate(req, res) )
+
 
     //Importação dos serviços lembrando que serviço agora é guia
     app.get("/servico/migrate", (req, res) => controller_servico.migrate(req, res) )
