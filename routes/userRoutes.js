@@ -41,6 +41,7 @@ const controller_servico = require('../controllers/servicoController')
 
 const controller_noticia_object = require('../controllers/noticiaObjectToArrayController')
 const controller_guia_object = require('../controllers/guiaObjectToArrayController')
+const controller_evento_object = require('../controllers/eventoObjectToArrayController')
 
 
 module.exports = (app, upload) => {
@@ -86,6 +87,8 @@ module.exports = (app, upload) => {
     app.get("/associa_evento_tag/migrate", (req, res) => controller_evento_tag.migrate(req, res) )
     app.get("/associa_evento_bairro/migrate", (req, res) => controller_evento_bairro.migrate(req, res) )
     app.get("/evento_img_destacada/migrate", (req, res) => controller_evento_image.migrate(req, res) )
+    app.get("/evento_object/migrate", (req, res) => controller_evento_object.migrate(req, res) )
+
 
     //Importação dos guias
     app.get("/guia/migrate", (req, res) => controller_guia.migrate(req, res) )
