@@ -55,6 +55,22 @@ class guiaObjectToArrayController {
 
             console.log("\n\n\n\nGuias ----------------->: ", guia.titulo, " --- wpid: ", guia.wpid)
 
+            
+
+
+            let cidades = guia.cidade.map(cidade => {
+                if(! cidade)
+                    return null;
+                let obj = {}
+                obj._id = cidade._id;
+                obj.nome = cidade.nome;
+                obj.descricao = cidade.descricao;
+                obj.slug = cidade.slug;
+                obj.imagem_destacada = cidade.imagem_destacada;
+
+                return obj;
+            })
+
             let categorias = guia.categorias.map(categoria => {
                 if(! categoria)
                     return null;
@@ -95,7 +111,7 @@ class guiaObjectToArrayController {
             })
  
 
-            let obj = {array_categorias: categorias, array_bairros: bairros, array_tags: tags}
+            let obj = {array_cidades: cidades, array_categorias: categorias, array_bairros: bairros, array_tags: tags}
 
             console.log("obj: ", obj);
 
@@ -128,9 +144,7 @@ class guiaObjectToArrayController {
         //console.log("\n\nconfig: ", config);
         try{
 	    let url_update = `${keys.URL_API}/guia/${guia_id}`
-	    console.log('\n\nupdate: ', url_update);
-            let ret = await axios.put(url_update, obj, config);
-	    console.log("obj: ", obj);
+	        let ret = await axios.put(url_update, obj, config);
             return ret;
         }
         catch(e){
@@ -171,7 +185,7 @@ class guiaObjectToArrayController {
         
         //console.log("\n\nconfig: ", config);
         try{
-	    let str_con = `${keys.URL_API}/guia?populateAssociation=true&_start=${start}&_limit=5`;
+	    let str_con = `${keys.URL_API}/guia?populateAssociation=true&_start=${start}&_limit=100`;
 	    console.log("string conexao: ", str_con);
             //let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=100`,  config);
             let ret = await axios.get(str_con,  config);
