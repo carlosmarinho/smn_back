@@ -37,6 +37,6 @@ app.use(cookieSession({
 require('./routes/userRoutes')(app);
 
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT_SMN_BACK_STRAPI_SERVER || process.env.PORT || 3001;
 console.log("listening on port http://localhost:" + PORT);
 app.listen(PORT);
