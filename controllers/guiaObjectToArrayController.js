@@ -127,7 +127,10 @@ class guiaObjectToArrayController {
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.put(`${keys.URL_API}/guia/${guia_id}`, obj, config);
+	    let url_update = `${keys.URL_API}/guia/${guia_id}`
+	    console.log('\n\nupdate: ', url_update);
+            let ret = await axios.put(url_update, obj, config);
+	    console.log("obj: ", obj);
             return ret;
         }
         catch(e){
@@ -168,7 +171,7 @@ class guiaObjectToArrayController {
         
         //console.log("\n\nconfig: ", config);
         try{
-	    let str_con = `${keys.URL_API}/guia?populateAssociation=true&_start=${start}&_limit=200`;
+	    let str_con = `${keys.URL_API}/guia?populateAssociation=true&_start=${start}&_limit=5`;
 	    console.log("string conexao: ", str_con);
             //let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=100`,  config);
             let ret = await axios.get(str_con,  config);
