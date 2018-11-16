@@ -23,7 +23,7 @@ const conn = mysql.createConnection(mysql_con);
 
 const axios = require('axios');
 
-class noticiaObjectToArrayController {
+class guiaObjectToArrayController {
     constructor(){
 
     }
@@ -44,18 +44,34 @@ class noticiaObjectToArrayController {
         
 	let jwt = await this.authenticate();
         //console.log("jwt: ", jwt.data.jwt);
-        let stripe_noticias = await this.getNoticias(jwt.data.jwt, req.query.start)
-        console.log('stripe_noticias: ', stripe_noticias.data.length);
+        let stripe_guias = await this.getGuias(jwt.data.jwt, req.query.start)
+        console.log('stripe_guias: ', stripe_guias.data.length);
 
-        await stripe_noticias.data.map(async noticia =>  {
+        await stripe_guias.data.map(async guia =>  {
 	    
-	    console.log("tamanho: ", noticia.array_categorias.length);
-   	    if(noticia.array_categorias.length>0)
-	    	return;
+	    /*console.log("tamanho: ", guia.array_categorias.length);
+   	    if(guia.array_categorias.length>0)
+	    	return; */
 
-            console.log("\n\n\n\nNoticias ----------------->: ", noticia.titulo, " --- wpid: ", noticia.wpid)
+            console.log("\n\n\n\nGuias ----------------->: ", guia.titulo, " --- wpid: ", guia.wpid)
 
-            let categorias = noticia.categorias.map(categoria => {
+            
+
+
+            let cidades = guia.cidade.map(cidade => {
+                if(! cidade)
+                    return null;
+                let obj = {}
+                obj._id = cidade._id;
+                obj.nome = cidade.nome;
+                obj.descricao = cidade.descricao;
+                obj.slug = cidade.slug;
+                obj.imagem_destacada = cidade.imagem_destacada;
+
+                return obj;
+            })
+
+            let categorias = guia.categorias.map(categoria => {
                 if(! categoria)
                     return null;
                 let obj = {}
@@ -68,7 +84,7 @@ class noticiaObjectToArrayController {
                 return obj;
             })
 
-            let bairros = noticia.bairros.map(bairro => {
+            let bairros = guia.bairros.map(bairro => {
                 if(! bairro)
                     return null;
                 let obj = {}
@@ -81,7 +97,7 @@ class noticiaObjectToArrayController {
                 return obj;
             })
 
-            let tags = noticia.tags.map(tag => {
+            let tags = guia.tags.map(tag => {
                 if(! tag)
                     return null;
                 let obj = {}
@@ -95,10 +111,11 @@ class noticiaObjectToArrayController {
             })
  
 
-            let obj = {array_categorias: categorias, array_bairros: bairros, array_tags: tags}
+            let obj = {array_cidades: cidades, array_categorias: categorias, array_bairros: bairros, array_tags: tags}
 
+            console.log("obj: ", obj);
 
-            await this.updateStrypeAssociacao(jwt.data.jwt, noticia._id, obj);
+            await this.updateStrypeAssociacao(jwt.data.jwt, guia._id, obj);
 
             
         }) 
@@ -109,24 +126,25 @@ class noticiaObjectToArrayController {
     }
 
     
-    getNoticiaByTermid(jwt, noticias, term_id) {
-    //    let noticias = await this.getNoticias(jwt)
+    getGuiaByTermid(jwt, guias, term_id) {
+    //    let guias = await this.getGuias(jwt)
 
-        //console.log("meus noticias: ", noticias);
+        //console.log("meus guias: ", guias);
 
-        return noticias.filter(noticia => {
-            //console.log(noticia.noticianame , " --- ", noticianame)
-            if(noticia.wpid == term_id)
-                return noticia;
+        return guias.filter(guia => {
+            //console.log(guia.guianame , " --- ", guianame)
+            if(guia.wpid == term_id)
+                return guia;
         })
     }
 
-    async updateStrypeAssociacao(jwt, noticia_id, obj){
+    async updateStrypeAssociacao(jwt, guia_id, obj){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.put(`${keys.URL_API}/noticia/${noticia_id}`, obj, config);
+	    let url_update = `${keys.URL_API}/guia/${guia_id}`
+	        let ret = await axios.put(url_update, obj, config);
             return ret;
         }
         catch(e){
@@ -134,17 +152,17 @@ class noticiaObjectToArrayController {
         } 
     }
 
-    async insertStrypeNoticia(jwt, noticia){
+    async insertStrypeGuia(jwt, guia){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-            let ret = await axios.post(`${keys.URL_API}/noticia`, noticia, config);
+            let ret = await axios.post(`${keys.URL_API}/guia`, guia, config);
             //console.log(ret);
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error insertStrypeNoticia: ", e.message);
+            console.log("\n\n\n error insertStrypeGuia: ", e.message);
         } 
     }
 
@@ -162,23 +180,23 @@ class noticiaObjectToArrayController {
         }
     }
 
-    async getNoticias(jwt, start){
+    async getGuias(jwt, start){
         let config = { headers: { 'Authorization': `Bearer ${jwt}` } };
         
         //console.log("\n\nconfig: ", config);
         try{
-	    let str_con = `${keys.URL_API}/noticia?populateAssociation=true&_start=${start}&_limit=10000`;
+	    let str_con = `${keys.URL_API}/guia?populateAssociation=true&_start=${start}&_limit=100`;
 	    console.log("string conexao: ", str_con);
-            //let ret = await axios.get(`${keys.URL_API}/noticia?imported_category=false&_start=0&_limit=100`,  config);
+            //let ret = await axios.get(`${keys.URL_API}/guia?imported_category=false&_start=0&_limit=100`,  config);
             let ret = await axios.get(str_con,  config);
             return ret;
         }
         catch(e){
-            console.log("\n\n\n error getNoticias: ", e.message);
+            console.log("\n\n\n error getGuias: ", e.message);
         }
     }
 
 
 }
 
-module.exports = new noticiaObjectToArrayController
+module.exports = new guiaObjectToArrayController
